@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: "#0a3622",
+              main: "#004d11",
+              emerald: "#059669",
+              light: "#e8f5e9",
+              orange: "#ea580c",
+              orangeHover: "#c2410c",
+              amber: "#d97706"
+            }
+          },
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f7faf5;
+      font-family: 'Poppins', sans-serif;
+      color: #1a202c;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[#f7faf5] text-[#1c241d] selection:bg-[#c5eabd]">
+<!-- HEADER PRINCIPAL (Fondo verde oscuro profundo #0a3622 como SCREEN_20 Desktop) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#0a3622] text-white pt-safe shadow-lg border-b border-[#0f4d30]">
+<!-- Fila 1: Brand & Controles rápidos -->
+<div class="px-4 pt-3 pb-2 flex items-center justify-between gap-2">
+<!-- Izquierda: Logos e Identidad -->
+<div class="flex items-center gap-2.5 min-w-0">
+<!-- Logo JustFood -->
+<div class="flex items-center gap-1.5 flex-shrink-0">
+<div class="w-8 h-8 rounded-full bg-[#84da80] text-[#0a3622] flex items-center justify-center shadow-inner font-bold">
+<span class="material-symbols-outlined text-[19px]">restaurant</span>
+</div>
+<span class="text-[17px] font-bold tracking-tight text-white flex items-center">
+            Just<span class="text-[#84da80]">Food</span>
+</span>
+</div>
+<!-- Badge Pizza Zeka -->
+<div class="flex items-center px-2 py-0.5 rounded-full bg-[#ea580c] text-white text-[11px] font-semibold tracking-wide shadow-sm flex-shrink-0">
+          Pizza Zeka
+        </div>
+</div>
+<!-- Derecha: Acciones Rápidas del Turno -->
+<div class="flex items-center gap-1.5 flex-shrink-0">
+<!-- WhatsApp -->
+<a class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/15 text-emerald-400 flex items-center justify-center transition-all" href="https://wa.me/" title="WhatsApp Clientes">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+<!-- Sonido -->
+<button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/15 text-white/90 flex items-center justify-center transition-all" title="Alertas de Sonido">
+<span class="material-symbols-outlined text-[18px]">volume_up</span>
+</button>
+<!-- Turno Abierto Pill -->
+<div class="hidden xs:flex sm:flex items-center gap-1 px-2 py-1 rounded-md bg-[#135334] text-[11px] text-[#a7f3d0] font-medium border border-[#1f6d46]">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span>Abierto</span>
+</div>
+<!-- Perfil Usuario -->
+<button class="w-8 h-8 rounded-full bg-[#155b38] border border-white/20 text-white flex items-center justify-center text-[12px] font-semibold">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</button>
+</div>
+</div>
+<!-- Fila 2: Sucursal & Estado En Vivo -->
+<div class="px-4 pb-2.5 flex items-center justify-between text-[11px] text-white/80">
+<div class="flex items-center gap-1.5 font-medium truncate">
+<span class="material-symbols-outlined text-[14px] text-[#84da80]">storefront</span>
+<span class="truncate">Sucursal Central / Wilde</span>
+</div>
+<div class="flex items-center gap-1.5 flex-shrink-0">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+</span>
+<span class="text-emerald-300 font-medium">En Vivo (1s)</span>
+</div>
+</div>
+<!-- Fila 3: Navegación de Tabs (Idéntico Desktop) -->
+<nav class="px-3 flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-white/10 py-1.5 bg-[#082b1b]">
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#004d11] text-white text-[12px] font-semibold shadow-sm border border-[#166534] flex-shrink-0" href="#">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+<span>Comandero &amp; Cocina</span>
+<span class="ml-0.5 px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">7</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/5 text-[12px] font-medium flex-shrink-0 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+<span>Menú &amp; Stock</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/5 text-[12px] font-medium flex-shrink-0 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">monitoring</span>
+<span>Estadísticas</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/5 text-[12px] font-medium flex-shrink-0 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">table_restaurant</span>
+<span>Salón</span>
+</a>
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/5 text-[12px] font-medium flex-shrink-0 transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+<span>Ajustes</span>
+</a>
+</nav>
+</header>
+<!-- CONTENIDO PRINCIPAL -->
+<main class="flex-1 w-full max-w-xl mx-auto px-4 pt-[156px] pb-24 flex flex-col gap-4">
+<!-- MÉTRICAS Y RESUMEN OPERATIVO LIMPIO -->
+<section class="grid grid-cols-3 gap-2.5 pt-1">
+<!-- Métrica 1 -->
+<div class="bg-white rounded-xl p-2.5 border border-emerald-950/5 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center text-center">
+<span class="text-[20px] font-bold text-[#004d11] leading-none mb-1">7</span>
+<span class="text-[11px] font-medium text-gray-500 leading-tight">Comandas Activas</span>
+</div>
+<!-- Métrica 2 -->
+<div class="bg-white rounded-xl p-2.5 border border-emerald-950/5 shadow-[0_2px_8px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center text-center">
+<div class="flex items-center gap-1 text-[17px] font-bold text-gray-800 leading-none mb-1">
+<span class="text-[13px]">⏱️</span> 18m
+        </div>
+<span class="text-[11px] font-medium text-gray-500 leading-tight">Despacho prom.</span>
+</div>
+<!-- Métrica 3 -->
+<div class="bg-rose-50/80 rounded-xl p-2.5 border border-rose-200/80 shadow-[0_2px_8px_rgba(225,29,72,0.05)] flex flex-col items-center justify-center text-center">
+<div class="flex items-center gap-1 text-[17px] font-bold text-rose-700 leading-none mb-1">
+<span class="text-[13px]">⚠️</span> 1
+        </div>
+<span class="text-[11px] font-semibold text-rose-700 leading-tight">Demorada</span>
+</div>
+</section>
+<!-- BARRA DE BÚSQUEDA Y FILTROS TIPO DE PEDIDO -->
+<section class="flex flex-col gap-2.5">
+<!-- Input buscador con aire -->
+<div class="relative flex items-center bg-white rounded-xl border border-gray-200 shadow-sm px-3.5 py-2.5 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/10 transition-all">
+<span class="material-symbols-outlined text-gray-400 text-[20px] mr-2.5">search</span>
+<input class="w-full bg-transparent text-[13px] text-gray-800 placeholder-gray-400 focus:outline-none font-normal" placeholder="Buscar por # comanda, cliente o ítem..." type="text"/>
+<button class="text-gray-400 hover:text-gray-600 ml-1 p-0.5">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+</button>
+</div>
+<!-- Píldoras de filtrado de pedidos -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+<button class="px-3.5 py-1.5 rounded-full bg-[#004d11] text-white text-[12px] font-medium shadow-sm whitespace-nowrap">
+          Todos (7)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-50 text-gray-700 text-[12px] font-medium border border-gray-200 shadow-sm whitespace-nowrap transition-colors">
+          🛵 Delivery (5)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-50 text-gray-700 text-[12px] font-medium border border-gray-200 shadow-sm whitespace-nowrap transition-colors">
+          🏪 Retiro (2)
+        </button>
+</div>
+</section>
+<!-- SEGMENTED CONTROL: ETAPAS DEL KDS (Solución limpia al scroll infinito) -->
+<nav class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5 pt-1">
+<!-- 1. Nuevos (ACTIVO) -->
+<button class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 border-2 border-amber-500 text-amber-950 font-semibold text-[12px] shadow-sm whitespace-nowrap flex-shrink-0">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+<span>1. Nuevos</span>
+<span class="px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[10px] font-bold ml-0.5">2</span>
+</button>
+<!-- 2. En Cocina / Horno -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-medium text-[12px] whitespace-nowrap hover:bg-gray-50 flex-shrink-0 transition-colors">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<span>2. En Cocina / Horno</span>
+<span class="px-1.5 py-0.2 rounded-full bg-gray-100 text-gray-600 text-[10px]">1</span>
+</button>
+<!-- 3. En Reparto / Viaje -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-medium text-[12px] whitespace-nowrap hover:bg-gray-50 flex-shrink-0 transition-colors">
+<span class="w-2 h-2 rounded-full bg-sky-500"></span>
+<span>3. En Reparto</span>
+<span class="px-1.5 py-0.2 rounded-full bg-gray-100 text-gray-600 text-[10px]">1</span>
+</button>
+<!-- 4. Entregados -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-medium text-[12px] whitespace-nowrap hover:bg-gray-50 flex-shrink-0 transition-colors">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span>4. Entregados</span>
+<span class="px-1.5 py-0.2 rounded-full bg-gray-100 text-gray-600 text-[10px]">24</span>
+</button>
+</nav>
+<!-- LISTADO DE COMANDAS DE LA COLUMNA SELECCIONADA (NUEVOS) -->
+<div class="flex flex-col gap-4">
+<!-- CARD 1: Comanda #07 (Delivery - Demorada) -->
+<article class="bg-white rounded-2xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col gap-3 relative overflow-hidden">
+<!-- Indicador lateral / superior de urgencia -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-rose-500"></div>
+<!-- Encabezado de la comanda -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-[20px] font-bold text-gray-900 tracking-tight">#07</span>
+<span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-[#004d11] text-[11px] font-semibold border border-emerald-200/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">two_wheeler</span>
+              Web Delivery
+            </span>
+<span class="px-2.5 py-0.5 rounded-md bg-rose-50 text-rose-700 text-[11px] font-semibold border border-rose-200 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">alarm</span>
+              +28m Demorado
+            </span>
+</div>
+<button class="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Datos del cliente y dirección -->
+<div class="bg-gray-50/80 rounded-xl p-3 flex items-center justify-between border border-gray-100">
+<div class="flex flex-col min-w-0 pr-2">
+<span class="text-[14px] font-semibold text-gray-900 truncate">Martín Gómez</span>
+<a class="text-[12px] text-gray-500 hover:text-[#004d11] truncate flex items-center gap-1 mt-0.5" href="#">
+<span class="material-symbols-outlined text-[14px] text-gray-400 flex-shrink-0">location_on</span>
+<span class="underline decoration-gray-300 underline-offset-2">Salvador Soreda 6200, Wilde</span>
+</a>
+</div>
+<div class="flex items-center gap-1.5 flex-shrink-0">
+<a class="w-9 h-9 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center shadow-sm transition-transform active:scale-95" href="https://wa.me/" title="WhatsApp Cliente">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+<button class="w-9 h-9 rounded-full bg-white hover:bg-gray-100 text-gray-600 border border-gray-200 flex items-center justify-center shadow-sm transition-transform active:scale-95" title="Reimprimir Comanda">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+</div>
+</div>
+<!-- Detalle de ítems de la comanda -->
+<div class="flex flex-col divide-y divide-gray-100 text-[13px] font-normal">
+<div class="py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-100 text-[#004d11] text-[11px] font-bold flex items-center justify-center">1x</span>
+<span class="font-medium text-gray-800">Pizza Mamma Mía</span>
+</div>
+<span class="text-gray-600 font-semibold">$20.000</span>
+</div>
+<div class="py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-100 text-[#004d11] text-[11px] font-bold flex items-center justify-center">1x</span>
+<span class="font-medium text-gray-800">Margherita Clásica</span>
+</div>
+<span class="text-gray-600 font-semibold">$19.000</span>
+</div>
+<div class="py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-100 text-[#004d11] text-[11px] font-bold flex items-center justify-center">1x</span>
+<span class="text-gray-600">Stella Artois 1L</span>
+</div>
+<span class="text-gray-600 font-semibold">$5.000</span>
+</div>
+</div>
+<!-- Caja de nota / aclaración del cliente -->
+<div class="bg-amber-50/90 rounded-xl p-2.5 border border-amber-200/80 flex items-start gap-2">
+<span class="material-symbols-outlined text-amber-700 text-[18px] mt-0.5">sticky_note_2</span>
+<span class="text-[12px] text-amber-900 font-medium leading-snug">
+<strong class="font-semibold">Nota:</strong> "Masa bien crocante. Tocar timbre fuerte 2B"
+          </span>
+</div>
+<!-- Estado de pago y total -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+<span class="material-symbols-outlined text-[15px] text-emerald-700">check_circle</span>
+<span class="text-[11px] font-semibold tracking-wide">PAGADO (Transferencia)</span>
+</div>
+<div class="text-right">
+<span class="text-[18px] font-bold text-gray-900 tracking-tight">$44.000</span>
+</div>
+</div>
+<!-- Botón de acción principal: Pasar a Cocina -->
+<button class="w-full mt-1 py-3 px-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-semibold text-[13px] tracking-wide shadow-md shadow-orange-600/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[19px]">skillet</span>
+<span>PASAR A COCINA / HORNO</span>
+</button>
+</article>
+<!-- CARD 2: Comanda #08 (Retiro en mostrador) -->
+<article class="bg-white rounded-2xl p-4 shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col gap-3 relative overflow-hidden">
+<!-- Indicador superior -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-amber-400"></div>
+<!-- Encabezado de la comanda -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-[20px] font-bold text-gray-900 tracking-tight">#08</span>
+<span class="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-900 text-[11px] font-semibold border border-amber-200 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">storefront</span>
+              Retiro Mostrador
+            </span>
+<span class="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[11px] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">schedule</span>
+              Hace 3 min
+            </span>
+</div>
+<button class="w-8 h-8 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-50 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Datos del cliente -->
+<div class="bg-gray-50/80 rounded-xl p-3 flex items-center justify-between border border-gray-100">
+<div class="flex flex-col min-w-0 pr-2">
+<span class="text-[14px] font-semibold text-gray-900 truncate">Luciana Fernández</span>
+<div class="text-[12px] text-amber-800 font-medium truncate flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[14px] text-amber-600 flex-shrink-0">alarm_on</span>
+<span>Retira por mostrador: 21:45 hs</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 flex-shrink-0">
+<a class="w-9 h-9 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center shadow-sm transition-transform active:scale-95" href="https://wa.me/" title="WhatsApp Cliente">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+</a>
+<button class="w-9 h-9 rounded-full bg-white hover:bg-gray-100 text-gray-600 border border-gray-200 flex items-center justify-center shadow-sm transition-transform active:scale-95" title="Reimprimir Comanda">
+<span class="material-symbols-outlined text-[18px]">print</span>
+</button>
+</div>
+</div>
+<!-- Detalle de ítems de la comanda -->
+<div class="flex flex-col divide-y divide-gray-100 text-[13px] font-normal">
+<div class="py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-100 text-[#004d11] text-[11px] font-bold flex items-center justify-center">2x</span>
+<span class="font-medium text-gray-800">Burger JustDouble Smash</span>
+</div>
+<span class="text-gray-600 font-semibold">$22.400</span>
+</div>
+<div class="py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded bg-emerald-100 text-[#004d11] text-[11px] font-bold flex items-center justify-center">1x</span>
+<span class="font-medium text-gray-800">Papas Rústicas Cheddar</span>
+</div>
+<span class="text-gray-600 font-semibold">$7.200</span>
+</div>
+</div>
+<!-- Estado de pago y total -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5 text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full border border-gray-200">
+<span class="material-symbols-outlined text-[15px] text-gray-500">payments</span>
+<span class="text-[11px] font-semibold tracking-wide">COBRAR EN DESTINO</span>
+</div>
+<div class="text-right">
+<span class="text-[18px] font-bold text-gray-900 tracking-tight">$29.600</span>
+</div>
+</div>
+<!-- Botón de acción principal -->
+<button class="w-full mt-1 py-3 px-4 rounded-xl bg-[#ea580c] hover:bg-[#c2410c] text-white font-semibold text-[13px] tracking-wide shadow-md shadow-orange-600/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[19px]">skillet</span>
+<span>PASAR A COCINA / HORNO</span>
+</button>
+</article>
+</div>
+</main>
+<!-- BOTÓN FLOTANTE NUEVO PEDIDO -->
+<div class="fixed bottom-12 right-4 z-40">
+<a class="h-12 px-5 rounded-full bg-[#059669] hover:bg-[#047857] text-white flex items-center gap-2 shadow-[0_6px_20px_rgba(5,150,105,0.4)] active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span class="text-[13px] font-semibold tracking-wide">+ Nuevo Pedido</span>
+</a>
+</div>
+<!-- BARRA INFERIOR DE STATUS DEL SISTEMA -->
+<footer class="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-gray-200 text-gray-600 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
+<div class="h-10 px-4 flex items-center justify-between text-[11px] font-medium">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-gray-800">Sync: <span class="text-emerald-700 font-semibold">12ms</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">chat</span>
+<span class="text-gray-800">WhatsApp: <span class="text-emerald-700 font-semibold">Conectado</span></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-gray-500">print</span>
+<span class="text-gray-800">Print: <span class="text-emerald-700 font-semibold">Online</span></span>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,227 @@
+---
+name: Aura Appointment & Studio OS
+colors:
+  surface: '#fcf8ff'
+  surface-dim: '#dbd8e7'
+  surface-bright: '#fcf8ff'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#f5f2ff'
+  surface-container: '#efecfb'
+  surface-container-high: '#e9e6f5'
+  surface-container-highest: '#e3e1f0'
+  on-surface: '#1a1b25'
+  on-surface-variant: '#47464b'
+  inverse-surface: '#2f2f3b'
+  inverse-on-surface: '#f2effe'
+  outline: '#78767b'
+  outline-variant: '#c8c5cb'
+  surface-tint: '#5f5e64'
+  primary: '#000000'
+  on-primary: '#ffffff'
+  primary-container: '#1b1b20'
+  on-primary-container: '#848389'
+  inverse-primary: '#c8c5cc'
+  secondary: '#5149c8'
+  on-secondary: '#ffffff'
+  secondary-container: '#6b63e2'
+  on-secondary-container: '#fffbff'
+  tertiary: '#000000'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#002109'
+  on-tertiary-container: '#009844'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#e4e1e9'
+  primary-fixed-dim: '#c8c5cc'
+  on-primary-fixed: '#1b1b20'
+  on-primary-fixed-variant: '#47464c'
+  secondary-fixed: '#e3dfff'
+  secondary-fixed-dim: '#c4c0ff'
+  on-secondary-fixed: '#110068'
+  on-secondary-fixed-variant: '#3b30b1'
+  tertiary-fixed: '#6bff8f'
+  tertiary-fixed-dim: '#4ae176'
+  on-tertiary-fixed: '#002109'
+  on-tertiary-fixed-variant: '#005321'
+  background: '#fcf8ff'
+  on-background: '#1a1b25'
+  surface-variant: '#e3e1f0'
+typography:
+  headline-xl:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 36px
+    fontWeight: '600'
+    lineHeight: 44px
+    letterSpacing: -0.03em
+  headline-xl-mobile:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 28px
+    fontWeight: '600'
+    lineHeight: 36px
+    letterSpacing: -0.02em
+  headline-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 26px
+    fontWeight: '600'
+    lineHeight: 34px
+    letterSpacing: -0.02em
+  headline-lg-mobile:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 22px
+    fontWeight: '600'
+    lineHeight: 28px
+    letterSpacing: -0.015em
+  headline-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 20px
+    fontWeight: '600'
+    lineHeight: 28px
+    letterSpacing: -0.015em
+  headline-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 17px
+    fontWeight: '600'
+    lineHeight: 24px
+    letterSpacing: -0.01em
+  body-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+    letterSpacing: -0.005em
+  body-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 14px
+    fontWeight: '400'
+    lineHeight: 20px
+    letterSpacing: 0em
+  body-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 13px
+    fontWeight: '400'
+    lineHeight: 18px
+    letterSpacing: 0em
+  label-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 14px
+    fontWeight: '600'
+    lineHeight: 18px
+    letterSpacing: 0em
+  label-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 12px
+    fontWeight: '500'
+    lineHeight: 16px
+    letterSpacing: 0.01em
+  label-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 11px
+    fontWeight: '600'
+    lineHeight: 14px
+    letterSpacing: 0.02em
+rounded:
+  sm: 0.5rem
+  DEFAULT: 1rem
+  md: 1.5rem
+  lg: 2rem
+  xl: 3rem
+  full: 9999px
+spacing:
+  gutter: 1.25rem
+  gutter-desktop: 1.5rem
+  margin: 1rem
+  margin-tablet: 1.5rem
+  margin-desktop: 2rem
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 0.875rem
+  space-lg: 1.25rem
+  space-xl: 1.75rem
+  space-2xl: 2.5rem
+---
+## Brand & Style
+This design system defines a high-end, calm, and operationally rigorous SaaS platform for aesthetic clinics, premier barber clubs, dermatologists, and wellness studios across Latin America. It marries the ultra-polished, serene ergonomics of boutique lifestyle concierge tools with the deterministic clarity required by high-velocity appointment scheduling, POS transactions, and customer relationship management.
+The visual style is characterized by **Soft Tactile Glass & Pill Minimalism**:
+- **Canvas Calm:** A tinted lavender-tinted pearl canvas creates an anti-fatigue environment for receptionists, stylists, and clinic owners working on screens all day.
+- **Sculpted Surface Architecture:** Primary surfaces are treated as pristine, ultra-rounded modules (border radiuses spanning 24px to 32px) resting subtly over the tinted baseline with faint micro-borders and weightless ambient shadows.
+- **Pill-Driven Navigation & Interactions:** High-contrast pitch-black and deep carbon pill elements demarcate active states, primary actions, and key navigation nodes, providing instant focus without visual noise.
+- **Discreet Luxury:** Color is used with surgical intention: luminous lavender for accents, mint sage for confirmed/active bookings, warm amber for pending approvals, and crimson vermilion for cancellations or urgent alerts.
+## Colors
+The palette is engineered to feel fresh, airy, and clinical yet warm. It rejects stark clinical white in favor of a soothing, layered light spectrum with rich carbon contrasts.
+### Core Roles
+- **Primary (`#121217`):** Deep Obsidian. Used for high-priority navigation pills, active buttons, solid toggle states, and primary headlines. Evokes bespoke authority and crisp readability.
+- **Secondary (`#7069E8`):** Electric Iris. Used for brand highlights, AI recommendation badges, selected calendar indicators, and intelligent scheduling prompts.
+- **Tertiary / Success (`#22C55E`):** Mint Sage. Signals confirmed bookings, seated clients, open slots, and completed payments.
+- **Neutral (`#767582`):** Heather Slate. Balanced neutral for secondary metadata, subtext, subtle border definitions, and inactive tab labels.
+### Surface & Ambient Tint Roles
+- **Canvas Base:** `#ECEBF5` to `#F4F3F8`. A cool, tinted lavender-gray that frames inner white cards.
+- **Surface Container (Cards & Dialogs):** `#FFFFFF`. Pure crisp white containers providing clear demarcation against the lavender background.
+- **Surface Muted / Inset:** `#F4F3F9`. Used for nested table rows, input fields, search bars, and stacked card previews.
+- **Borders & Dividers:** `rgba(28, 25, 43, 0.06)` for delicate card boundaries and separation lines.
+### Functional Status Indicators
+- **Active / Confirmed:** `#10B981` (Emerald) paired with subtle background `#ECFDF5`.
+- **Pending / Intake:** `#8B5CF6` (Violet) paired with background `#F5F3FF`.
+- **Alert / Overdue / No-Show:** `#EF4444` (Crimson) paired with background `#FEF2F2`.
+- **Draft / In-Progress:** `#F59E0B` (Amber) paired with background `#FFFBEB`.
+## Typography
+Typography relies on **Plus Jakarta Sans** across all roles to achieve geometric clarity, soft modern terminals, and high legibility at dense information scales. 
+- **Display & Headings:** Tightly tracked with negative letter spacing (`-0.02em` to `-0.03em`) to mimic editorial magazine covers while maintaining clinical crispness.
+- **Numbers & Metrics:** Large metrics (e.g., daily appointments, revenue tallies, client age) use medium-to-bold weights with tabular figures enabled (`font-variant-numeric: tabular-nums`) so that data lines align naturally.
+- **Status & Navigation Labels:** Kept compact (11px to 13px) with slightly open letter spacing for glanceable recognition on schedule timelines and quick-action chips.
+## Layout & Spacing
+The layout is built upon an expansive **12-column adaptive fluid grid** with generous outer breathing room, ensuring modular widgets can snap into two-column, three-column, or asymmetrical dashboard configurations.
+### Grid & Canvas Structure
+- **Outer Shell:** In desktop views, the entire application sits within a floating rounded viewport frame with 24px–32px outer canvas margins, showcasing the subtle lavender back-drop.
+- **Gutter Rhythm:** 20px (`1.25rem`) on tablets, expanding to 24px (`1.5rem`) on full desktop screens to enforce airiness between standalone functional modules.
+- **Card Padding Hierarchy:**
+  - Compact Cards (e.g., KPI metrics, mini user stacks): `space-lg` (20px).
+  - Primary Structural Cards (e.g., Daily Agenda, Appointment Queue, Financial Graphs): `space-xl` (28px).
+### Breakpoints & Adaptive Reflow
+- **Mobile (< 768px):** Single-column stack. Floating navigation bar converts to a docked bottom pill navigation. Modals slide up as bottom sheets with 28px top radiuses.
+- **Tablet (768px – 1199px):** 6-column reflow. Agenda timeline sits full-width beneath condensed client cards and metric tiles.
+- **Desktop (1200px+):** Full 12-column dashboard layout. Left-hand queue and stacked profile cards occupy 3–4 columns; central AI/analytics blocks occupy 4–5 columns; day-schedule and agenda views span the remaining columns.
+## Elevation & Depth
+This design system avoids heavy drop shadows or harsh skeuomorphic bevels, instead leveraging **Ambient Optical Depth**:
+1. **Base Foundation (Level 0):** The soft canvas tint (`#ECEBF5` / `#F4F3F8`) grounds the application.
+2. **Primary Tile Float (Level 1):** Solid white card tiles (`#FFFFFF`) feature a perimeter ring of `1px solid rgba(25, 20, 45, 0.05)` combined with a diffused, two-layer atmospheric shadow:
+   `box-shadow: 0 4px 20px -2px rgba(45, 35, 80, 0.03), 0 12px 32px -4px rgba(45, 35, 80, 0.04);`
+3. **Card Stacks & Nested Previews (Level 2):** Layered cards simulating multiple records (e.g., patient/client profiles) scale down in 4% increments, peaking from behind with stepped 12px vertical offsets and muted backgrounds (`#F4F3F9`), yielding tangible physical depth.
+4. **Floating Navigation & Action Island (Level 3):** Top header bars, pill tabs, and quick-filter buttons adopt frosted backdrop filters:
+   `backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.85);`
+   Active pill tabs inside navigation bars use solid `#121217` with sharp contrast against the translucent container.
+5. **Interactive Hover Lift:** Cards subtly translate `-2px` on hover with shadow expansion:
+   `box-shadow: 0 16px 40px -6px rgba(45, 35, 80, 0.08);`
+## Shapes
+The shape vocabulary is defined by **Pill Geometries and Oversized Smooth Corners**, projecting an approachable, modern beauty-tech aesthetic:
+- **Large Structural Cards:** `28px` to `32px` border-radius (`rounded-3xl`). This distinctive curvature gives dashboards their signature soft silhouette.
+- **Nested Inner Containers & Table Blocks:** `18px` to `22px` border-radius.
+- **Buttons, Filter Bars, Day Pickers & Micro-Badges:** Complete `9999px` full pill shapes (`rounded-full`). 
+- **Interactive Action Pills:** Circular action icons (e.g., diagonal arrow triggers `↗`, search toggles, and notification bells) adopt full 1:1 circle aspect ratios with matching curved surfaces.
+## Components
+### Buttons
+- **Primary Pill Button:** Solid Obsidian `#121217` background, pure white text, fully pill-shaped (`rounded-full`), height 44px, horizontal padding 20px. Includes optional trailing micro-circular icon or directional arrow `↗`.
+- **Secondary / Ghost Pill:** Pure white background with `1px solid rgba(28, 25, 43, 0.08)`, obsidian text, hover background `#F9F9FC`.
+- **Circular Icon Button:** 40px × 40px circle, white background or translucent blur, containing crisp 16px stroke icons (e.g., calendar icon, plus button, external link `↗`).
+### Calendar Day Selector & Date Navigation
+- Horizontal row of pill segments.
+- Inactive day displays weekday abbreviation, date number, and a subtle numerical badge (`count pill`) indicating scheduled bookings (e.g., `Sep 2  6`).
+- Active day transforms into a solid obsidian pill or high-contrast pill with pure white typography, while the appointment counter transitions to an inverted badge.
+### Status Pills & Micro-Badges
+- Miniature 24px height pills with internal 6px circular indicator dots.
+- **Active / Confirmed:** Light mint background (`#ECFDF5`), forest text (`#047857`), emerald pulse dot.
+- **Pending / In Review:** Soft lilac background (`#F5F3FF`), violet text (`#6D28D9`), iris dot.
+- **Alert / Overdue:** Light rose background (`#FEF2F2`), carmine text (`#B91C1C`), crimson dot.
+### Input Fields & Search Bars
+- 44px height with full pill radius (`rounded-full`) or smooth 16px radius.
+- Background in subtle `#F4F3F9` with zero visible border in idle state, transitioning to `1.5px solid #7069E8` on active focus.
+- Embedded leading search icon (`#767582`) with placeholder text styled in `body-md` slate.
+### Stacked Client / Appointment Cards
+- Multi-layered preview card module.
+- Foreground active card displays client photo, full name, treatment service (e.g., "Balayage & Styling", "HydraFacial"), treatment time, and status tag.
+- Secondary and tertiary cards peek from behind with 8px vertical increments and horizontal inset margins, simulating a tactile physical deck of client cards ready for intake.
+### Appointment Timeline Row
+- Compact, clean horizontal row with fixed time chip (e.g., `09:00`, `10:30`) on the left, connected by a subtle vertical connector rail.
+- Accommodates client avatar, service description, practitioner tag, and category chip (e.g., `Color`, `Consultation`, `Follow-up`).
+- On hover, reveals a trailing arrow button (`↗`) for instant slide-over drawer opening.

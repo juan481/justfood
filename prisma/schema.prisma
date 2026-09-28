@@ -1,0 +1,509 @@
+// JustFood — Prisma schema
+//
+// Fase 0: Tenant, Branch, User (+ roles), TenantApiKey.
+// Fase 1 adds: Category/Product (catálogo), Order/OrderItem/OrderStatusEvent
+// (pedidos, canales web+mostrador), TableInventory/Reservation/Lead/PageView
+// (ports directos del prototipo de PizzaZeka), TenantSettings/PaymentConfig/
+// POSIntegrationConfig (reemplazo tipado de la tabla `config` KV), DeliveryZone.
+// WaConversation/WaMessage/PaymentReceipt (agente de WhatsApp) llegan en Fase 2b-2d.
+//
+// Multitenancy strategy: shared schema, row-level `tenantId` on every
+// tenant-owned table (see plan section 2) — same pattern as the CRM.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  COCINA
+  CADETE
+  MOSTRADOR
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  timezone  String   @default("America/Argentina/Buenos_Aires")
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches Branch[]
+  users    User[]
+  apiKeys  TenantApiKey[]
+
+  categories           Category[]
+  products             Product[]
+  orders               Order[]
+  tables               TableInventory[]
+  reservations         Reservation[]
+  leads                Lead[]
+  pageViews            PageView[]
+  settings             TenantSetting[]
+  deliveryZones        DeliveryZone[]
+  paymentConfig        PaymentConfig?
+  posIntegrationConfig POSIntegrationConfig?
+  paymentReceipts      PaymentReceipt[]
+  couriers             Courier[]
+
+  @@map("tenants")
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  address   String?
+  lat       Float?
+  lng       Float?
+  isDefault Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant        Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users         User[]
+  orders        Order[]
+  tables        TableInventory[]
+  reservations  Reservation[]
+  deliveryZones DeliveryZone[]
+  couriers      Courier[]
+
+  @@index([tenantId])
+  @@map("branches")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  tenantId     String
+  branchId     String?
+  username     String
+  passwordHash String
+  role         UserRole
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  // Username is globally unique (not just per tenant) so login never needs
+  // a tenant hint — the username alone resolves which restaurant the staff
+  // member belongs to.
+  @@unique([username])
+  @@index([tenantId])
+  @@map("users")
+}
+
+model TenantApiKey {
+  id         String    @id @default(cuid())
+  tenantId   String
+  keyHash    String    @unique
+  label      String
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("tenant_api_keys")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Fase 1 — catálogo, pedidos, y ports directos del prototipo de PizzaZeka
+// ─────────────────────────────────────────────────────────────────────────
+
+model Category {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@index([tenantId])
+  @@map("categories")
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  tenantId        String
+  categoryId      String?
+  name            String
+  description     String?
+  // Whole pesos, matches PizzaZeka's `products.price INTEGER` convention
+  // exactly — no cents, no floats.
+  price           Int
+  isActive        Boolean  @default(true)
+  // "Congelados" merchandising flag, ported verbatim from the prototype
+  // (products.is_frozen) rather than generalized into a tags system —
+  // nothing in Fase 1 needs more than this yet.
+  isFrozen        Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  imageUrl        String?
+  // Original SQLite row id, kept for ETL traceability (plan section 7).
+  legacyProductId Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@unique([tenantId, legacyProductId])
+  @@index([tenantId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+enum OrderChannel {
+  WEB
+  MOSTRADOR
+  WHATSAPP
+}
+
+enum OrderStatus {
+  // Pedidos de WhatsApp por transferencia caen acá hasta que un humano
+  // aprueba el comprobante (Fase 2d) — invisibles para el tablero de KDS
+  // mientras estén en este estado (plan sección 6).
+  EN_ESPERA_PAGO
+  NUEVO
+  COCINA
+  REPARTO
+  ENTREGADO
+  CANCELADO
+}
+
+model Order {
+  id              String       @id @default(cuid())
+  tenantId        String
+  branchId        String
+  orderCode       String
+  channel         OrderChannel
+  status          OrderStatus  @default(NUEVO)
+  deliveryType    String       @default("delivery")
+  customerName    String?
+  customerPhone   String?
+  address         String?
+  locality        String?
+  notes           String?
+  // Texto libre, igual que el prototipo (server.js compara contra
+  // 'efectivo' explícitamente, el resto son métodos digitales) — no
+  // inventamos un enum que el prototipo no tiene.
+  paymentMethod   String       @default("efectivo")
+  paymentStatus   String       @default("pendiente")
+  // totalAmount = suma de items + deliveryFee, siempre recalculado en el
+  // server (nunca confiado del cliente). deliveryFee separado para poder
+  // desglosarlo en el drawer/comanda impresa ("Subtotal productos" +
+  // "Costo de envío" por separado).
+  totalAmount     Int
+  deliveryFee     Int          @default(0)
+  // Copia denormalizada del nombre — se sigue mostrando en la comanda
+  // impresa/drawer aunque el Courier se borre después. courierId es la
+  // relación real, usada por el módulo Cadetes & Repartidores.
+  courierName     String?
+  courierId       String?
+  // Efectivo cobrado por un cadete en la entrega, todavía sin "rendir" en
+  // caja central — null mientras está pendiente, se completa al liquidar
+  // (módulo Cadetes, "Rendición de Caja").
+  cashSettledAt   DateTime?
+  // Recalculado siempre en el server a partir de OrderItem — nunca se
+  // confía en un total que mande el cliente (fix del bug del prototipo,
+  // plan sección 7).
+  idempotencyKey  String?
+  createdByUserId String?
+  // Optimistic concurrency para transiciones de estado (plan sección 7).
+  version         Int          @default(0)
+  legacyOrderId   Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch  Branch   @relation(fields: [branchId], references: [id])
+  courier Courier? @relation(fields: [courierId], references: [id])
+
+  items           OrderItem[]
+  statusEvents    OrderStatusEvent[]
+  paymentReceipts PaymentReceipt[]
+
+  @@unique([tenantId, idempotencyKey])
+  @@unique([tenantId, legacyOrderId])
+  @@index([tenantId, status])
+  @@index([tenantId, channel])
+  @@index([courierId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String  @id @default(cuid())
+  orderId             String
+  productId           String?
+  productNameSnapshot String
+  unitPriceSnapshot   Int
+  quantity            Int     @default(1)
+  notes               String?
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model OrderStatusEvent {
+  id              String       @id @default(cuid())
+  orderId         String
+  fromStatus      OrderStatus?
+  toStatus        OrderStatus
+  changedByUserId String?
+  createdAt       DateTime     @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_status_events")
+}
+
+model TableInventory {
+  id       String  @id @default(cuid())
+  tenantId String
+  branchId String
+  capacity Int
+  quantity Int     @default(0)
+  label    String?
+  legacyId Int?
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@unique([tenantId, legacyId])
+  @@index([tenantId])
+  @@map("tables_inventory")
+}
+
+model Reservation {
+  id                String   @id @default(cuid())
+  tenantId          String
+  branchId          String
+  customerName      String
+  customerPhone     String?
+  reservationDate   String
+  timeSlot          String
+  peopleCount       Int
+  tableCapacityUsed Int
+  status            String   @default("confirmada")
+  notes             String?
+  legacyId          Int?
+  createdAt         DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@unique([tenantId, legacyId])
+  @@index([tenantId])
+  @@map("reservations")
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  tenantId  String
+  email     String
+  code      String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Distinto del prototipo (email UNIQUE global) — dos restaurantes
+  // distintos pueden compartir un mismo cliente/email (plan sección 2).
+  @@unique([tenantId, email])
+  @@map("leads")
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  tenantId  String
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("page_views")
+}
+
+// Reemplazo flexible (KV) de la tabla `config` del prototipo, para los
+// toggles de cola larga que no ameritan una columna propia (discount_*,
+// module_*, whatsapp_number, kds_sound_enabled, business_name, etc.) —
+// ver plan sección 2. Los valores con forma/uso bien definido (pagos, POS)
+// se promueven a PaymentConfig/POSIntegrationConfig más abajo.
+model TenantSetting {
+  tenantId  String
+  key       String
+  value     String?
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, key])
+  @@map("tenant_settings")
+}
+
+model PaymentConfig {
+  tenantId               String   @id
+  paymentAlias           String?
+  paymentTitular         String?
+  paymentCvu             String?
+  // Encriptado con src/lib/crypto.ts — nunca texto plano (bug fijado
+  // respecto al prototipo, que guarda esto en texto plano en `config`).
+  mpAccessTokenEncrypted String?
+  mpEnabled              Boolean  @default(false)
+  cashEnabled            Boolean  @default(true)
+  updatedAt              DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("payment_configs")
+}
+
+model POSIntegrationConfig {
+  tenantId          String    @id
+  provider          String    @default("fudo")
+  enabled           Boolean   @default(false)
+  apiTokenEncrypted String?
+  businessId        String?
+  lastSyncAt        DateTime?
+  lastSyncStatus    String?
+  updatedAt         DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("pos_integration_configs")
+}
+
+model DeliveryZone {
+  id           String  @id @default(cuid())
+  tenantId     String
+  branchId     String
+  name         String
+  // "radius" para el modelo plano actual de PizzaZeka; "polygon" queda
+  // listo para cuando un tenant lo necesite (plan sección 7) sin rediseño.
+  type         String  @default("radius")
+  radiusKm     Float?
+  cost         Int
+  minOrderCost Int?
+  isActive     Boolean @default(true)
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@index([tenantId])
+  @@map("delivery_zones")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Fase 2d — cola "Pagos por Revisar" (schema + UI construidos ahora, contra
+// datos de prueba; la extracción real por Gemini Vision llega recién cuando
+// haya GEMINI_API_KEY — ver plan sección 6.4).
+// ─────────────────────────────────────────────────────────────────────────
+
+enum ReceiptAutoValidationStatus {
+  MATCH
+  AMOUNT_MISMATCH
+  ALIAS_MISMATCH
+  DUPLICATE
+  UNREADABLE
+  // Sin extracción automática todavía — comprobante cargado a mano o el
+  // paso de Gemini Vision no corrió (fallback mientras no haya API key).
+  PENDING_EXTRACTION
+}
+
+enum ReceiptFinalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model PaymentReceipt {
+  id       String @id @default(cuid())
+  tenantId String
+  orderId  String
+
+  imageUrl String
+
+  // Campos que va a llenar Gemini Vision (Fase 2d real) — nullable porque
+  // por ahora se cargan a mano o quedan sin extraer.
+  extractedAmount          Int?
+  extractedAliasOrCvu      String?
+  extractedOperationNumber String?
+  extractedAt              DateTime?
+  aiRawResponse            String?
+
+  autoValidationStatus ReceiptAutoValidationStatus @default(PENDING_EXTRACTION)
+
+  reviewedByUserId String?
+  reviewedAt       DateTime?
+  finalStatus      ReceiptFinalStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Índice de deduplicación: un mismo número de operación no puede
+  // aprobarse dos veces para el mismo tenant (plan sección 6.4).
+  @@index([tenantId, extractedOperationNumber])
+  @@index([tenantId, finalStatus])
+  @@map("payment_receipts")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Cadetes & Repartidores — reemplaza el Order.courierName de texto libre
+// por una flota real, visible también como contador en vivo en el Comandero.
+// ─────────────────────────────────────────────────────────────────────────
+
+enum CourierStatus {
+  DISPONIBLE
+  EN_VIAJE
+  INACTIVO
+}
+
+model Courier {
+  id                String        @id @default(cuid())
+  tenantId          String
+  branchId          String
+  firstName         String
+  lastName          String
+  phone             String?
+  vehicle           String?
+  plate             String?
+  // Comisión fija por envío — "Tarifa por Envío" en el alta rápida.
+  tariffPerDelivery Int           @default(0)
+  // Habilitado para el turno de hoy — se puede desactivar sin borrar el
+  // registro (vacaciones, franco, etc.).
+  isActiveToday     Boolean       @default(true)
+  status            CourierStatus @default(DISPONIBLE)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch Branch @relation(fields: [branchId], references: [id])
+  orders Order[]
+
+  @@index([tenantId])
+  @@map("couriers")
+}

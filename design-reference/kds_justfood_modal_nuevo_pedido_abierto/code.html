@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html class="h-full overflow-hidden" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JustFood OS — Comandero &amp; KDS de Alto Rendimiento</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            command: {
+              950: "#042610",
+              900: "#06381a",
+              800: "#0a4d25",
+              700: "#0e6431",
+            },
+            limeaccent: "#9ff799",
+            canvas: "#f4f6f1",
+          },
+          fontFamily: {
+            sans: ['"Poppins"', '"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(15, 23, 42, 0.15);
+      border-radius: 9999px;
+    }
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-canvas text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-command-800 selection:text-white relative overflow-hidden">
+<!-- COMMAND BAR SUPERIOR (VERDE BOSQUE / ESMERALDA PROFUNDO IMPONENTE) -->
+<header class="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white shadow-xl shadow-command-950/25 sticky top-0 z-10 filter blur-[1px]">
+<div class="max-w-[1920px] mx-auto px-4 lg:px-7 py-3 flex flex-wrap items-center justify-between gap-4"><!-- Identidad y Local -->
+<div class="flex items-center gap-4"><div class="flex items-center gap-3.5"><div class="flex items-center gap-2.5 shrink-0 select-none"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-command-700 p-0.5 shadow-md flex items-center justify-center ring-1 ring-limeaccent/40"><div class="w-full h-full rounded-[10px] bg-command-900/90 flex items-center justify-center"><svg class="w-5 h-5 text-limeaccent" fill="currentColor" viewbox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"></path></svg></div></div><div class="flex items-baseline tracking-tight font-sans"><span class="text-2xl font-bold text-white tracking-tight">Just</span><span class="text-2xl font-black text-limeaccent tracking-tight">Food</span></div></div><div class="h-6 w-px bg-white/20 hidden sm:block"></div><div class="flex items-center gap-3 select-none"><div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-orange-600/90 text-white shadow-sm border border-orange-200/20"><div class="w-5 h-5 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-xs shadow-inner"><span class="material-symbols-rounded text-sm">local_pizza</span></div><span class="text-xs font-bold tracking-wide text-white">Pizza Zeka</span></div><div class="h-4 w-px bg-white/20 hidden sm:block"></div><div class="flex items-center gap-2 text-xs text-white/80 font-normal"><span class="inline-flex items-center gap-1.5 text-white/90 font-medium"><span class="material-symbols-rounded text-sm text-limeaccent">storefront</span> Sucursal Central / Wilde</span><span class="text-white/30">•</span><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-400/20 text-limeaccent font-medium text-[11px] border border-limeaccent/30"><span class="w-2 h-2 rounded-full bg-limeaccent animate-ping"></span> En Vivo (1s)</span></div></div></div></div>
+<!-- Métricas y Conectividad central en verde bosque -->
+<div class="hidden xl:flex items-center gap-3">
+<div class="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-black/20 border border-white/10 text-xs font-normal text-white/80">
+<span class="material-symbols-rounded text-limeaccent text-lg">chat</span>
+<span class="text-white/60">WhatsApp:</span>
+<span class="font-medium text-white tracking-wide">+54 11 7072-6537</span>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black/20 border border-white/10 text-xs font-medium text-limeaccent">
+<span class="w-2.5 h-2.5 rounded-full bg-limeaccent"></span>
+    Turno Abierto
+  </div>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/20 hover:bg-white/10 border border-white/10 text-xs font-medium text-white/90 transition" title="Activar / Silenciar Notificaciones Sonoras"><span class="material-symbols-rounded text-limeaccent text-base">volume_up</span><span class="">Sonido</span></button></div>
+</div>
+<!-- Navegación Secundaría Minimalista -->
+<div class="border-t border-white/10 bg-black/15 px-4 lg:px-7 py-2 filter blur-[1px]">
+<div class="max-w-[1920px] mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar"><a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-command-950 shadow-sm" href="#">
+<span class="material-symbols-rounded text-sm">restaurant</span>
+  Comandero &amp; Cocina
+  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-command-900 text-limeaccent">7</span>
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">menu_book</span> Menú &amp; Stock
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">insights</span> Estadísticas
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">table_bar</span> Salón &amp; Mesas
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">qr_code_2</span> Menú QR
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">payments</span> Arqueo &amp; Caja
+</a></div>
+</div>
+</header>
+<!-- BARRA OPERATIVA / FILTROS DIRECTOS (ALTO CONTRASTE, CERO RUIDO) -->
+<section class="max-w-[1920px] mx-auto w-full px-4 lg:px-7 pt-5 pb-3 filter blur-[1.5px] select-none pointer-events-none">
+<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4"><div class="flex items-center flex-wrap gap-3 flex-1 min-w-[300px]">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-rounded absolute left-3.5 top-3 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 hover:bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 rounded-xl text-sm font-normal placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-800 transition" placeholder="Buscar por # comanda, cliente o ítem..." type="text"/>
+</div>
+<div class="inline-flex p-1 bg-slate-100 rounded-xl">
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-white text-slate-900 shadow-sm">Todos</button>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-normal text-slate-600 hover:text-slate-900">🛵 Delivery</button>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-normal text-slate-600 hover:text-slate-900">🛍️ Retiro</button>
+</div>
+</div>
+<!-- Marcadores Clave -->
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-slate-700">
+<span class="material-symbols-rounded text-command-800 text-base">receipt_long</span>
+<span class=""><b class="text-slate-900 font-semibold text-sm">7</b> Comandas Activas</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-slate-700">
+<span class="material-symbols-rounded text-blue-600 text-base">schedule</span>
+<span class=""><span class="font-semibold">18 min</span> despacho prom.</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-100 text-red-700 font-semibold border border-red-200">
+<span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+    1 Demorada
+  </div>
+</div></div>
+</section>
+<!-- KDS RAIL: 4 COLUMNAS DE ALTA LEGIBILIDAD -->
+<main class="flex-1 max-w-[1920px] w-full mx-auto px-4 lg:px-7 pb-6 filter blur-[2px] select-none pointer-events-none opacity-85">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+<!-- COLUMNA 1: INGRESADOS / NUEVOS -->
+<section class="flex flex-col gap-3 min-h-[680px]">
+<div class="bg-amber-100/90 border border-amber-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-amber-500"></span>
+<h2 class="font-semibold text-sm tracking-wide text-amber-950">1. Nuevos / Recibidos</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white">2</span>
+</div>
+<article class="bg-white rounded-2xl p-5 shadow-sm border border-red-200 flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<div class="flex items-baseline gap-2">
+<span class="font-semibold text-2xl text-slate-900 tracking-tight">#07</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600">Web</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600">🛵 Delivery</span>
+</div>
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-600 text-white">
+<span class="material-symbols-rounded text-sm">alarm</span> +28m Demorado
+</div>
+</div>
+<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+<h3 class="font-medium text-slate-900 text-sm">Martín Gómez</h3>
+<p class="text-xs text-slate-500 mt-1 font-normal flex items-center gap-1">
+<span class="material-symbols-rounded text-sm text-slate-400">location_on</span> Salvador Soreda 6200, Wilde
+</p>
+</div>
+</article>
+</section>
+<!-- COLUMNA 2: EN COCINA / HORNO -->
+<section class="flex flex-col gap-3 min-h-[680px]">
+<div class="bg-orange-100/90 border border-orange-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-orange-600"></span>
+<h2 class="font-semibold text-sm tracking-wide text-orange-950">2. En Cocina / Horno</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-600 text-white">1</span>
+</div>
+</section>
+<!-- COLUMNA 3: EN REPARTO / DESPACHO -->
+<section class="flex flex-col gap-3 min-h-[680px]">
+<div class="bg-blue-100/90 border border-blue-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-blue-600"></span>
+<h2 class="font-semibold text-sm tracking-wide text-blue-950">3. En Reparto / Viaje</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-600 text-white">1</span>
+</div>
+</section>
+<!-- COLUMNA 4: ENTREGADOS -->
+<section class="flex flex-col gap-3 min-h-[680px]">
+<div class="bg-emerald-100/90 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-command-800"></span>
+<h2 class="font-semibold text-sm tracking-wide text-emerald-950">4. Entregados (Hoy)</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-command-800 text-white">24</span>
+</div>
+</section>
+</div>
+</main>
+<!-- FOOTER TÉCNICO -->
+<footer class="mt-auto bg-white border-t border-slate-200/80 px-4 lg:px-7 py-3 text-xs text-slate-500 filter blur-[1px]">
+<div class="max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-3"><div class="flex items-center gap-3">
+<span>•</span>
+<span class="font-normal">Creado y desarrollado por Just Create</span>
+<span class="hidden md:inline">•</span>
+<span class="hidden md:inline font-normal">Sucursal Wilde</span>
+</div>
+<div class="flex items-center gap-5 text-[11px] font-normal">
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-command-800"></span> Bot WhatsApp Conectado</span>
+<span class="flex items-center gap-1.5 text-command-800 font-medium">Sync: 12ms</span>
+</div></div>
+</footer>
+<!-- BACKDROP & MODAL OVERLAY: CARGA DE NUEVO PEDIDO MANUAL -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-8 bg-slate-950/70 backdrop-blur-md transition-all">
+<!-- Contenedor Principal del Modal -->
+<div class="bg-white rounded-3xl shadow-2xl border border-white/20 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+<!-- Encabezado del Modal -->
+<div class="bg-gradient-to-r from-command-950 via-command-900 to-command-800 px-6 py-4 text-white flex items-center justify-between border-b border-white/10 shrink-0">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-limeaccent shadow-inner">
+<span class="material-symbols-rounded text-2xl">post_add</span>
+</div>
+<div>
+<div class="flex items-center gap-2.5">
+<h2 class="text-lg font-bold tracking-tight text-white">Nuevo Pedido / Comanda Manual</h2>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-limeaccent text-command-950 tracking-wider">#09 (Turno Noche)</span>
+</div>
+<p class="text-xs text-white/75 font-normal flex items-center gap-2 mt-0.5">
+<span class="inline-flex items-center gap-1 text-white/90 font-medium">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              21:48 hs
+            </span>
+<span>•</span>
+<span>Carga rápida directa para cocina y despacho</span>
+</p>
+</div>
+</div>
+<button class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white/80 hover:text-white flex items-center justify-center transition border border-white/10" title="Cerrar modal">
+<span class="material-symbols-rounded text-xl">close</span>
+</button>
+</div>
+<!-- Selector de Tipo de Pedido (Pestañas Gigantes Ergonómicas) -->
+<div class="bg-surface-container-low px-6 py-3 border-b border-slate-200/80 shrink-0">
+<div class="grid grid-cols-3 gap-3">
+<!-- Delivery Activo -->
+<button class="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm bg-command-900 text-white shadow-md shadow-command-950/20 ring-2 ring-command-800 transition">
+<span class="text-lg">🛵</span>
+<span>Delivery</span>
+<span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md text-[10px] bg-limeaccent text-command-950 font-bold uppercase">Envío</span>
+</button>
+<!-- Retiro Mostrador -->
+<button class="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl font-medium text-xs sm:text-sm bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition">
+<span class="text-lg">🛍️</span>
+<span>Retiro Mostrador</span>
+<span class="hidden sm:inline-block text-[11px] text-slate-400">0$ envío</span>
+</button>
+<!-- Mesa / Salón -->
+<button class="flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl font-medium text-xs sm:text-sm bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition">
+<span class="text-lg">🍽️</span>
+<span>Mesa / Salón</span>
+<span class="hidden sm:inline-block text-[11px] text-slate-400">Consumo aquí</span>
+</button>
+</div>
+</div>
+<!-- Cuerpo Dividido en 2 Columnas: Formulario/Menú & Resumen/Comanda -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-50/50">
+<!-- COLUMNA IZQUIERDA: Datos Cliente + Selector Rápido de Productos (7 columnas) -->
+<div class="lg:col-span-7 flex flex-col gap-5">
+<!-- 1. Datos del Cliente & Destino -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3.5">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+<span class="material-symbols-rounded text-sm text-command-700">person</span>
+              Datos del Destino &amp; Cliente
+            </span>
+<span class="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+<span class="material-symbols-rounded text-xs">verified</span> Cliente frecuente registrado
+            </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1">Nombre Completo</label>
+<div class="relative">
+<span class="material-symbols-rounded absolute left-3 top-2.5 text-slate-400 text-base">badge</span>
+<input class="w-full pl-9 pr-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-700" type="text" value="Facundo Almada"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1">Teléfono / WhatsApp</label>
+<div class="relative">
+<span class="material-symbols-rounded absolute left-3 top-2.5 text-emerald-600 text-base">chat</span>
+<input class="w-full pl-9 pr-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-700 font-mono" type="text" value="+54 9 11 5821-9944"/>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+<div class="sm:col-span-2">
+<label class="block text-xs font-medium text-slate-600 mb-1">Dirección de Entrega</label>
+<div class="relative">
+<span class="material-symbols-rounded absolute left-3 top-2.5 text-slate-400 text-base">location_on</span>
+<input class="w-full pl-9 pr-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-700" type="text" value="Av. Mitre 5420, Piso 3 Dpto B, Wilde"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-slate-600 mb-1">Opciones / Mesa</label>
+<input class="w-full px-3 py-2 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-700" placeholder="Entre calles / Piso" type="text"/>
+</div>
+</div>
+</div>
+<!-- 2. Catálogo & Búsqueda Táctil de Menú -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col gap-3.5">
+<div class="flex items-center justify-between gap-3">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+<span class="material-symbols-rounded text-sm text-command-700">menu_book</span>
+              Añadir Ítems al Pedido
+            </span>
+<div class="relative flex-1 max-w-xs">
+<span class="material-symbols-rounded absolute left-3 top-2 text-slate-400 text-base">search</span>
+<input class="w-full pl-8 pr-3 py-1.5 bg-slate-100 hover:bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 rounded-lg text-xs font-normal placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-800" placeholder="Buscar pizza, empanadas, bebidas..." type="text" value="Pizza Fug"/>
+</div>
+</div>
+<!-- Píldoras de Categorías Rápidas -->
+<div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
+<button class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-command-900 text-limeaccent flex items-center gap-1.5 shrink-0 shadow-sm">
+<span class="material-symbols-rounded text-sm">local_pizza</span> Pizzas Grandes
+            </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 shrink-0 transition">
+<span class="material-symbols-rounded text-sm">bakery_dining</span> Empanadas
+            </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 shrink-0 transition">
+<span class="material-symbols-rounded text-sm">lunch_dining</span> Hamburguesas
+            </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 shrink-0 transition">
+<span class="material-symbols-rounded text-sm">local_drink</span> Bebidas &amp; Cervezas
+            </button>
+<button class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center gap-1.5 shrink-0 transition">
+<span class="material-symbols-rounded text-sm">icecream</span> Postres
+            </button>
+</div>
+<!-- Grilla de Productos Rápidos para Tocar/Clickear -->
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+<!-- Producto 1 (Seleccionado) -->
+<button class="text-left p-3 rounded-xl bg-emerald-50/80 border-2 border-command-700 hover:border-command-800 transition flex flex-col justify-between relative group">
+<span class="absolute top-2 right-2 w-5 h-5 rounded-full bg-command-700 text-white font-bold text-[10px] flex items-center justify-center">1</span>
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Fugazzeta Rellena</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Doble muzzarella, cebolla</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-emerald-200/60 w-full">
+<span class="text-xs font-bold text-command-900">$24.000</span>
+<span class="text-[10px] font-semibold text-command-700">+ Sumar</span>
+</div>
+</button>
+<!-- Producto 2 (Seleccionado) -->
+<button class="text-left p-3 rounded-xl bg-emerald-50/80 border-2 border-command-700 hover:border-command-800 transition flex flex-col justify-between relative group">
+<span class="absolute top-2 right-2 w-5 h-5 rounded-full bg-command-700 text-white font-bold text-[10px] flex items-center justify-center">1</span>
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Fainá Tradicional x2</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Porción al molde</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-emerald-200/60 w-full">
+<span class="text-xs font-bold text-command-900">$3.000</span>
+<span class="text-[10px] font-semibold text-command-700">+ Sumar</span>
+</div>
+</button>
+<!-- Producto 3 -->
+<button class="text-left p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition flex flex-col justify-between group">
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Muzza Especial</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Salsa casera, aceitunas</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-200 w-full">
+<span class="text-xs font-semibold text-slate-700">$18.500</span>
+<span class="text-[10px] text-slate-400 group-hover:text-command-700">+ Añadir</span>
+</div>
+</button>
+<!-- Producto 4 -->
+<button class="text-left p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition flex flex-col justify-between group">
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Napolitana con Ajo</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Rodajas de tomate fresco</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-200 w-full">
+<span class="text-xs font-semibold text-slate-700">$21.000</span>
+<span class="text-[10px] text-slate-400 group-hover:text-command-700">+ Añadir</span>
+</div>
+</button>
+<!-- Producto 5 -->
+<button class="text-left p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition flex flex-col justify-between group">
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Empanadas Docena</p>
+<p class="text-[11px] text-slate-500 mt-0.5">12x Carne / Jamón / Pollo</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-200 w-full">
+<span class="text-xs font-semibold text-slate-700">$18.000</span>
+<span class="text-[10px] text-slate-400 group-hover:text-command-700">+ Añadir</span>
+</div>
+</button>
+<!-- Producto 6 -->
+<button class="text-left p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition flex flex-col justify-between group">
+<div>
+<p class="font-semibold text-xs text-slate-900 leading-snug">Coca Cola 1.5L</p>
+<p class="text-[11px] text-slate-500 mt-0.5">Línea Original fría</p>
+</div>
+<div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-200 w-full">
+<span class="text-xs font-semibold text-slate-700">$4.000</span>
+<span class="text-[10px] text-slate-400 group-hover:text-command-700">+ Añadir</span>
+</div>
+</button>
+</div>
+</div>
+</div>
+<!-- COLUMNA DERECHA: Ítems Cargados + Notas Cocina + Resumen + Pago (5 columnas) -->
+<div class="lg:col-span-5 flex flex-col gap-4">
+<!-- Detalle de la Comanda en Curso -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col">
+<div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+<span class="material-symbols-rounded text-sm text-command-700">receipt</span>
+              Comanda en Construcción
+            </span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-command-900">2 ítems</span>
+</div>
+<!-- Lista de ítems cargados con stepper de cantidad -->
+<div class="divide-y divide-slate-100 py-2 space-y-2">
+<!-- Ítem 1 -->
+<div class="pt-2 flex items-center justify-between gap-2">
+<div class="flex-1">
+<p class="text-xs font-bold text-slate-900">Pizza Fugazzeta Rellena</p>
+<p class="text-[11px] text-slate-500">Masa al molde tradicional</p>
+</div>
+<div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+<button class="w-6 h-6 rounded bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shadow-xs">-</button>
+<span class="text-xs font-bold font-mono px-1">1</span>
+<button class="w-6 h-6 rounded bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shadow-xs">+</button>
+</div>
+<span class="text-xs font-bold text-slate-900 w-16 text-right">$24.000</span>
+</div>
+<!-- Ítem 2 -->
+<div class="pt-2 flex items-center justify-between gap-2">
+<div class="flex-1">
+<p class="text-xs font-bold text-slate-900">Fainá Tradicional x2</p>
+<p class="text-[11px] text-slate-500">Doble porción</p>
+</div>
+<div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+<button class="w-6 h-6 rounded bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shadow-xs">-</button>
+<span class="text-xs font-bold font-mono px-1">1</span>
+<button class="w-6 h-6 rounded bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shadow-xs">+</button>
+</div>
+<span class="text-xs font-bold text-slate-900 w-16 text-right">$3.000</span>
+</div>
+</div>
+<!-- Nota directa de cocción / aclaración para los pizzeros -->
+<div class="mt-3 pt-3 border-t border-slate-100">
+<label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
+<span class="material-symbols-rounded text-xs text-orange-600">skillet</span>
+              Nota Directa de Cocina / Horno:
+            </label>
+<input class="w-full px-3 py-1.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs font-medium text-amber-950 placeholder-amber-700/60 focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="Ej: Masa bien tostada, cortar en 8, sin orégano..." type="text" value="Masa bien dorada y crocante. Entregar caliente."/>
+</div>
+</div>
+<!-- Forma de Pago & Estado de Cobro -->
+<div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+<span class="material-symbols-rounded text-sm text-command-700">payments</span>
+            Método &amp; Estado de Cobro
+          </span>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2 px-2.5 rounded-xl border border-command-700 bg-emerald-50/70 font-semibold text-xs text-command-950 flex flex-col items-center gap-0.5 shadow-sm">
+<span class="material-symbols-rounded text-base text-command-700">attach_money</span>
+<span>Efectivo</span>
+</button>
+<button class="py-2 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white font-medium text-xs text-slate-700 flex flex-col items-center gap-0.5">
+<span class="material-symbols-rounded text-base text-blue-600">swap_horiz</span>
+<span>Transferencia</span>
+</button>
+<button class="py-2 px-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white font-medium text-xs text-slate-700 flex flex-col items-center gap-0.5">
+<span class="material-symbols-rounded text-base text-sky-500">credit_card</span>
+<span>Mercado Pago</span>
+</button>
+</div>
+<!-- Toggle Cobro -->
+<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs">
+<span class="font-medium text-slate-700">Estado del Pago:</span>
+<div class="inline-flex p-0.5 bg-white rounded-lg border border-slate-300">
+<button class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-500 hover:text-slate-900">Ya Cobrado</button>
+<button class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-500 text-white shadow-xs">Pendiente (Cobrar al entregar)</button>
+</div>
+</div>
+<!-- Resumen de Costos -->
+<div class="space-y-1.5 pt-1 text-xs">
+<div class="flex justify-between text-slate-500">
+<span>Subtotal Productos</span>
+<span class="font-medium text-slate-800">$27.000</span>
+</div>
+<div class="flex justify-between text-slate-500">
+<span>Costo Envío Delivery (Wilde)</span>
+<span class="font-medium text-slate-800">$1.500</span>
+</div>
+<div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
+<span>Total Comanda</span>
+<span class="text-xl font-bold text-command-900 font-mono">$28.500</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Barra Inferior de Acciones Rápidas del Modal -->
+<div class="bg-white border-t border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+<div class="flex items-center gap-2 text-xs text-slate-500">
+<span class="material-symbols-rounded text-command-700 text-base">print</span>
+<label class="flex items-center gap-1.5 cursor-pointer select-none">
+<input checked="" class="rounded text-command-700 focus:ring-command-700 w-4 h-4 border-slate-300" type="checkbox"/>
+<span class="font-medium text-slate-700">Imprimir comanda térmica automáticamente</span>
+</label>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<button class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold text-xs uppercase tracking-wider transition">
+          Cancelar
+        </button>
+<button class="flex-1 sm:flex-initial px-7 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-orange-600/30 transition">
+<span class="material-symbols-rounded text-lg">local_fire_department</span>
+<span>Enviar Directo a Cocina / Horno</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

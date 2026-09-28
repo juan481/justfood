@@ -1,0 +1,425 @@
+<!DOCTYPE html><html class="h-full" lang="es" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JustFood OS — Comandero &amp; KDS de Alto Rendimiento</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            command: {
+              950: "#042610",
+              900: "#06381a",
+              800: "#0a4d25",
+              700: "#0e6431",
+            },
+            limeaccent: "#9ff799",
+            canvas: "#f4f6f1",
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(15, 23, 42, 0.15);
+      border-radius: 9999px;
+    }
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-canvas text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-command-800 selection:text-white">
+<!-- COMMAND BAR SUPERIOR (VERDE BOSQUE / ESMERALDA PROFUNDO IMPONENTE) -->
+<header class="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white shadow-xl shadow-command-950/25 sticky top-0 z-50">
+<div class="max-w-[1920px] mx-auto px-4 lg:px-7 py-3 flex flex-wrap items-center justify-between gap-4"><!-- Identidad y Local -->
+<div class="flex items-center gap-4"><div class="flex items-center gap-3.5"><div class="flex items-center gap-2.5 shrink-0 select-none"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-command-700 p-0.5 shadow-md flex items-center justify-center ring-1 ring-limeaccent/40"><div class="w-full h-full rounded-[10px] bg-command-900/90 flex items-center justify-center"><svg class="w-5 h-5 text-limeaccent" viewBox="0 0 24 24" fill="currentColor"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"></path></svg></div></div><div class="flex items-baseline tracking-tight font-sans"><span class="text-2xl font-bold text-white tracking-tight">Just</span><span class="text-2xl font-black text-limeaccent tracking-tight">Food</span></div></div><div class="h-6 w-px bg-white/20 hidden sm:block"></div><div class="flex items-center gap-3 select-none"><div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-orange-600/90 text-white shadow-sm border border-orange-200/20"><div class="w-5 h-5 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-xs shadow-inner"><span class="material-symbols-rounded text-sm">local_pizza</span></div><span class="text-xs font-bold tracking-wide text-white">Pizza Zeka</span></div><div class="h-4 w-px bg-white/20 hidden sm:block"></div><div class="flex items-center gap-2 text-xs text-white/80 font-normal"><span class="inline-flex items-center gap-1.5 text-white/90 font-medium"><span class="material-symbols-rounded text-sm text-limeaccent">storefront</span> Sucursal Central / Wilde</span><span class="text-white/30">•</span><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-400/20 text-limeaccent font-medium text-[11px] border border-limeaccent/30"><span class="w-2 h-2 rounded-full bg-limeaccent animate-ping"></span> En Vivo (1s)</span></div></div></div></div>
+<!-- Métricas y Conectividad central en verde bosque -->
+<div class="hidden xl:flex items-center gap-3">
+<div class="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-black/20 border border-white/10 text-xs font-normal text-white/80">
+<span class="material-symbols-rounded text-limeaccent text-lg">chat</span>
+<span class="text-white/60">WhatsApp:</span>
+<span class="font-medium text-white tracking-wide">+54 11 7072-6537</span>
+</div>
+<div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-black/20 border border-white/10 text-xs font-medium text-limeaccent">
+<span class="w-2.5 h-2.5 rounded-full bg-limeaccent"></span>
+    Turno Abierto
+  </div>
+<button class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-black/20 hover:bg-white/10 border border-white/10 text-xs font-medium text-white/90 transition" title="Activar / Silenciar Notificaciones Sonoras"><span class="material-symbols-rounded text-limeaccent text-base">volume_up</span><span class="">Sonido</span></button></div>
+<!-- Acciones de Cabecera -->
+</div>
+<!-- Navegación Secundaría Minimalista -->
+<div class="border-t border-white/10 bg-black/15 px-4 lg:px-7 py-2">
+<div class="max-w-[1920px] mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar"><a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-command-950 shadow-sm" href="#">
+<span class="material-symbols-rounded text-sm">restaurant</span>
+  Comandero &amp; Cocina
+  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-command-900 text-limeaccent">7</span>
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">menu_book</span> Menú &amp; Stock
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">insights</span> Estadísticas
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">table_bar</span> Salón &amp; Mesas
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">qr_code_2</span> Menú QR
+</a>
+<a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition" href="#">
+<span class="material-symbols-rounded text-sm text-limeaccent">payments</span> Arqueo &amp; Caja
+</a></div>
+</div>
+</header>
+<!-- BARRA OPERATIVA / FILTROS DIRECTOS (ALTO CONTRASTE, CERO RUIDO) -->
+<section class="max-w-[1920px] mx-auto w-full px-4 lg:px-7 pt-5 pb-3">
+<div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-4"><div class="flex items-center flex-wrap gap-3 flex-1 min-w-[300px]">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-rounded absolute left-3.5 top-3 text-slate-400 text-lg">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 hover:bg-slate-50 focus:bg-white border-0 ring-1 ring-slate-200 rounded-xl text-sm font-normal placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-command-800 transition" placeholder="Buscar por # comanda, cliente o ítem..." type="text">
+</div>
+<div class="inline-flex p-1 bg-slate-100 rounded-xl">
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-white text-slate-900 shadow-sm">Todos</button>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-normal text-slate-600 hover:text-slate-900">🛵 Delivery</button>
+<button class="px-3.5 py-1.5 rounded-lg text-xs font-normal text-slate-600 hover:text-slate-900">🛍️ Retiro</button>
+</div>
+</div>
+<!-- Marcadores Clave -->
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-slate-700">
+<span class="material-symbols-rounded text-command-800 text-base">receipt_long</span>
+<span class=""><b class="text-slate-900 font-semibold text-sm">7</b> Comandas Activas</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-xl text-slate-700">
+<span class="material-symbols-rounded text-blue-600 text-base">schedule</span>
+<span class=""><span class="font-semibold">18 min</span> despacho prom.</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-100 text-red-700 font-semibold border border-red-200">
+<span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+    1 Demorada
+  </div>
+</div></div>
+</section>
+<!-- KDS RAIL: 4 COLUMNAS DE ALTA LEGIBILIDAD (PENSADO PARA DISTANCIA DE TRABAJO) -->
+<main class="flex-1 max-w-[1920px] w-full mx-auto px-4 lg:px-7 pb-6">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">
+<!-- COLUMNA 1: INGRESADOS / NUEVOS -->
+<section class="flex flex-col gap-3 min-h-[680px]"><!-- Header Columna -->
+<div class="bg-amber-100/90 border border-amber-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-amber-500"></span>
+<h2 class="font-semibold text-sm tracking-wide text-amber-950">1. Nuevos / Recibidos</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500 text-white">2</span>
+</div>
+<!-- Tarjeta #07 (Demorado) -->
+<article class="bg-white rounded-2xl p-5 shadow-sm border border-red-200 hover:shadow-md transition-all flex flex-col gap-4">
+<!-- Número Ligerito y Elegante & Tiempos -->
+<div class="flex items-start justify-between">
+<div class="flex items-baseline gap-2">
+<span class="font-semibold text-2xl text-slate-900 tracking-tight">#07</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600">Web</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600">🛵 Delivery</span>
+</div>
+<div class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-600 text-white animate-pulse">
+<span class="material-symbols-rounded text-sm">alarm</span> +28m Demorado
+    </div>
+</div>
+<!-- Cliente y Destino -->
+<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+<div class="flex items-center justify-between">
+<h3 class="font-medium text-slate-900 text-sm">Martín Gómez</h3>
+<a class="text-xs font-medium text-command-700 hover:underline flex items-center gap-1" href="#">
+<span class="material-symbols-rounded text-xs">chat</span> WhatsApp
+      </a>
+</div>
+<p class="text-xs text-slate-500 mt-1 font-normal flex items-center gap-1">
+<span class="material-symbols-rounded text-sm text-slate-400">location_on</span>
+      Salvador Soreda 6200, Wilde
+    </p>
+</div>
+<!-- Ítems de Cocina Refinados -->
+<div class="space-y-2.5 border-y border-slate-100 py-3 text-slate-900 text-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-amber-500/90 text-white font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-medium leading-snug text-slate-800">Pizza Mamma Mía</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$20.000</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-amber-500/90 text-white font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-medium leading-snug text-slate-800">Margherita Clásica</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$19.000</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-slate-200 text-slate-600 font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-normal text-slate-600">Stella Artois 1L</span>
+</div>
+<span class="text-xs font-normal text-slate-400">$5.000</span>
+</div>
+</div>
+<!-- Indicación de Cocina / Nota -->
+<div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 font-normal flex gap-2">
+<span class="material-symbols-rounded text-amber-600 text-base shrink-0">info</span>
+<span class="">Masa bien crocante. Tocar timbre fuerte 2B.</span>
+</div>
+<!-- Total Refinado -->
+<div class="flex items-center justify-between text-xs pt-1">
+<span class="inline-flex items-center gap-1 font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+<span class="material-symbols-rounded text-sm">check_circle</span> PAGADO (Transferencia)
+    </span>
+<span class="font-semibold text-base text-slate-900">$46.000</span>
+</div>
+<!-- Botón Refinado -->
+<button class="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm transition">
+<span class="material-symbols-rounded text-base">skillet</span> Pasar a Cocina / Horno
+  </button>
+</article>
+<!-- Tarjeta #08 -->
+<article class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-all flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<div class="flex items-baseline gap-2">
+<span class="font-semibold text-2xl text-slate-900 tracking-tight">#08</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-purple-100 text-purple-800">🛍️ Retiro</span>
+</div>
+<span class="px-2.5 py-1 rounded-full text-xs font-normal bg-slate-100 text-slate-600">Hace 3 min</span>
+</div>
+<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+<h3 class="font-medium text-slate-900 text-sm">Luciana Fernández</h3>
+<p class="text-xs text-slate-500 font-normal mt-0.5">Retira por mostrador: 21:45 hs</p>
+</div>
+<div class="space-y-2.5 border-y border-slate-100 py-3 text-slate-900 text-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-amber-500/90 text-white font-medium text-xs flex items-center justify-center">2x</span>
+<span class="font-medium leading-snug text-slate-800">Burger JustDouble Smash</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$22.400</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-amber-500/90 text-white font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-medium leading-snug text-slate-800">Papas Rústicas Cheddar</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$7.200</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs pt-1">
+<span class="inline-flex items-center gap-1 font-medium text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg">
+<span class="material-symbols-rounded text-sm">pending</span> COBRAR AL ENTREGAR
+    </span>
+<span class="font-semibold text-base text-slate-900">$29.600</span>
+</div>
+<button class="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm transition">
+<span class="material-symbols-rounded text-base">skillet</span> Pasar a Cocina / Horno
+  </button>
+</article></section>
+<!-- COLUMNA 2: EN COCINA / HORNO -->
+<section class="flex flex-col gap-3 min-h-[680px]"><div class="bg-orange-100/90 border border-orange-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-orange-600"></span>
+<h2 class="font-semibold text-sm tracking-wide text-orange-950">2. En Cocina / Horno</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-600 text-white">1</span>
+</div>
+<!-- Tarjeta #05 -->
+<article class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-all flex flex-col gap-4">
+<div class="flex items-start justify-between">
+<div class="flex items-baseline gap-2">
+<span class="font-semibold text-2xl text-slate-900 tracking-tight">#05</span>
+<span class="px-2 py-0.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700">🛵 Delivery</span>
+</div>
+<div class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+<span class="material-symbols-rounded text-sm">local_fire_department</span> Horno: 11 min
+    </div>
+</div>
+<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+<div class="flex items-center justify-between">
+<h3 class="font-medium text-slate-900 text-sm">Valentín Rossi</h3>
+<a class="text-xs font-medium text-command-700 hover:underline flex items-center gap-1" href="#">
+<span class="material-symbols-rounded text-xs">chat</span> WhatsApp
+      </a>
+</div>
+<p class="text-xs text-slate-500 mt-1 font-normal">Av. Mitre 2410, 4to C, Wilde</p>
+</div>
+<div class="space-y-2.5 border-y border-slate-100 py-3 text-slate-900 text-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-orange-600/90 text-white font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-medium leading-snug text-slate-800">Pizza Fugazzeta Rellena</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$24.000</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-orange-600/90 text-white font-medium text-xs flex items-center justify-center">12x</span>
+<span class="font-medium leading-snug text-slate-800">Empanadas Carne Cuchillo</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$18.000</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-slate-200 text-slate-600 font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-normal text-slate-600">Coca Cola 1.5L</span>
+</div>
+<span class="text-xs font-normal text-slate-400">$4.000</span>
+</div>
+</div>
+<div class="p-3 bg-orange-50 rounded-xl border border-orange-200 text-xs text-orange-950 font-normal flex gap-2">
+<span class="material-symbols-rounded text-orange-600 text-base shrink-0">restaurant</span>
+<span class="">Masa al molde dorada, empanadas bien jugosas.</span>
+</div>
+<div class="flex items-center justify-between text-xs pt-1">
+<span class="inline-flex items-center gap-1 font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+<span class="material-symbols-rounded text-sm">check_circle</span> PAGADO (MercadoPago)
+    </span>
+<span class="font-semibold text-base text-slate-900">$46.000</span>
+</div>
+<button class="w-full py-3 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 active:scale-[0.99] text-white font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm transition">
+<span class="material-symbols-rounded text-base">moped</span> Listo p/ Despacho
+  </button>
+</article></section>
+<!-- COLUMNA 3: EN REPARTO / DESPACHO -->
+<section class="flex flex-col gap-3 min-h-[680px]"><div class="bg-blue-100/90 border border-blue-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-blue-600"></span>
+<h2 class="font-semibold text-sm tracking-wide text-blue-950">3. En Reparto / Viaje</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-600 text-white">1</span>
+</div>
+<!-- Tarjeta #03 -->
+<article class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/90 hover:shadow-md transition-all flex flex-col gap-4">
+<div class="flex items-start justify-between"><div class="flex items-center gap-2"><span class="font-semibold text-2xl text-slate-900 tracking-tight">#03</span><span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200">Repartidor #2</span></div><div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"><span class="material-symbols-rounded text-sm">near_me</span><span class="">En viaje 8m</span></div></div>
+<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+<div class="flex items-center justify-between">
+<h3 class="font-medium text-slate-900 text-sm">Carolina Méndez</h3>
+<a class="text-xs font-medium text-command-700 hover:underline flex items-center gap-1" href="#">
+<span class="material-symbols-rounded text-xs">chat</span> WhatsApp
+      </a>
+</div>
+<p class="text-xs text-slate-500 mt-1 font-normal">Las Flores 380, Piso 1 B, Wilde</p>
+<p class="text-xs font-medium text-slate-700 mt-0.5">Lucas Vera (Moto Honda)</p>
+</div>
+<div class="space-y-2.5 border-y border-slate-100 py-3 text-slate-900 text-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-blue-600 text-white font-medium text-xs flex items-center justify-center">2x</span>
+<span class="font-medium leading-snug text-slate-800">Pizza Napolitana Especial</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$38.000</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-md bg-blue-600 text-white font-medium text-xs flex items-center justify-center">1x</span>
+<span class="font-medium leading-snug text-slate-800">Faina Tradicional x2</span>
+</div>
+<span class="text-xs font-medium text-slate-500">$3.000</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs pt-1">
+<span class="inline-flex items-center gap-1 font-medium text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg">
+<span class="material-symbols-rounded text-sm">payments</span> COBRAR EN DESTINO
+    </span>
+<span class="font-semibold text-base text-slate-900">$43.000</span>
+</div>
+<button class="w-full py-3 px-4 rounded-xl bg-command-800 hover:bg-command-900 active:scale-[0.99] text-white font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm transition">
+<span class="material-symbols-rounded text-base">check_circle</span> Marcar Entregado
+  </button>
+</article></section>
+<!-- COLUMNA 4: ENTREGADOS (RESUMEN EN VIVO) -->
+<section class="flex flex-col gap-3 min-h-[680px]"><div class="bg-emerald-100/90 border border-emerald-200 rounded-2xl px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="w-3 h-3 rounded-full bg-command-800"></span>
+<h2 class="font-semibold text-sm tracking-wide text-emerald-950">4. Entregados (Hoy)</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-command-800 text-white">24</span>
+</div>
+<!-- KPI Rápido de Turno -->
+<div class="bg-command-900 text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+<div>
+<p class="text-xs uppercase font-medium text-limeaccent tracking-wider">Facturado en Turno</p>
+<p class="text-2xl font-semibold mt-0.5">$348.500</p>
+</div>
+<div class="text-right">
+<span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-limeaccent text-command-950">100% a tiempo</span>
+<p class="text-[11px] text-white/70 mt-1 font-normal">24 comandas</p>
+</div>
+</div>
+<!-- Tarjetas compactas de historial rápido -->
+<div class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200/80 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-full bg-emerald-100 text-command-800 flex items-center justify-center">
+<span class="material-symbols-rounded text-sm">done</span>
+</span>
+<div>
+<p class="font-medium text-xs text-slate-900">#02 Santiago Peralta</p>
+<p class="text-[11px] text-slate-400 font-normal">20:58 hs • Delivery</p>
+</div>
+</div>
+<span class="font-medium text-xs text-slate-700">$32.000</span>
+</div>
+<div class="bg-white rounded-xl p-3.5 shadow-sm border border-slate-200/80 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-7 h-7 rounded-full bg-emerald-100 text-command-800 flex items-center justify-center">
+<span class="material-symbols-rounded text-sm">done</span>
+</span>
+<div>
+<p class="font-medium text-xs text-slate-900">#01 Florencia V.</p>
+<p class="text-[11px] text-slate-400 font-normal">20:42 hs • Retiro en Local</p>
+</div>
+</div>
+<span class="font-medium text-xs text-slate-700">$18.500</span>
+</div>
+<!-- Zona drop limpia -->
+<div class="border-2 border-dashed border-slate-200 bg-white/50 rounded-2xl p-6 text-center text-slate-400 flex flex-col items-center justify-center gap-2 flex-1">
+<span class="material-symbols-rounded text-3xl text-slate-300">task_alt</span>
+<p class="text-xs font-normal max-w-[200px] text-slate-500">Comandas completadas pasan automáticamente aquí</p>
+</div></section>
+</div>
+</main>
+<!-- FOOTER TÉCNICO -->
+<footer class="mt-auto bg-white border-t border-slate-200/80 px-4 lg:px-7 py-3 text-xs text-slate-500">
+<div class="max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-3"><div class="flex items-center gap-3">
+
+<span class="">•</span>
+<span class="font-normal">Creado y desarrollado por Just Create</span>
+<span class="hidden md:inline">•</span>
+<span class="hidden md:inline font-normal">Sucursal Wilde</span>
+</div>
+<div class="flex items-center gap-5 text-[11px] font-normal">
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-command-800"></span> Bot WhatsApp Conectado</span>
+
+<span class="flex items-center gap-1.5 text-command-800 font-medium">Sync: 12ms</span>
+</div></div>
+</footer>
+<button class="fixed bottom-8 right-8 z-50 inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-command-700 hover:bg-command-800 text-white font-semibold text-sm shadow-xl hover:shadow-2xl border border-white/20 transition-all active:scale-[0.98]" style="box-shadow: 0 10px 25px -5px rgba(6, 56, 26, 0.4);"><span class="material-symbols-rounded text-xl text-limeaccent">add_circle</span><span class="tracking-wide">&nbsp;Nuevo Pedido</span></button>
+
+
+
+</body></html>

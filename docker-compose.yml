@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: justfood-dev-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: justfood
+      POSTGRES_PASSWORD: justfood_dev
+      POSTGRES_DB: justfood
+    ports:
+      # 5432/5433 are already taken by other local projects on this machine
+      # (jdm_db_dev, turncreate_postgres) — 5434 is free.
+      - "5434:5432"
+    volumes:
+      - justfood-db-data:/var/lib/postgresql/data
+
+volumes:
+  justfood-db-data:

@@ -1,0 +1,289 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-primary-fixed":"#002204","on-primary":"#ffffff","error-container":"#ffdad6","surface-variant":"#dfe4d9","primary-fixed":"#9ff799","on-secondary-fixed":"#032106","surface-tint":"#146d22","on-secondary-container":"#4a6a47","outline-variant":"#bfcab9","tertiary":"#7a1a43","on-primary-container":"#8ce388","on-tertiary":"#ffffff","primary-fixed-dim":"#84da80","error":"#ba1a1a","on-error-container":"#93000a","on-surface":"#171d16","on-tertiary-fixed-variant":"#812148","outline":"#707a6c","on-secondary":"#ffffff","tertiary-container":"#98335a","on-tertiary-fixed":"#3e001d","primary":"#004d11","on-error":"#ffffff","secondary-container":"#c5eabd","surface-container-high":"#e4eadf","on-background":"#171d16","surface-container-lowest":"#ffffff","surface-bright":"#f6fbf0","primary-container":"#08671c","inverse-primary":"#84da80","secondary":"#466643","inverse-surface":"#2c322b","on-primary-fixed-variant":"#005313","on-secondary-fixed-variant":"#2f4e2d","secondary-fixed-dim":"#acd0a5","surface-container-low":"#f0f5ea","background":"#f6fbf0","inverse-on-surface":"#edf3e7","surface-container":"#eaf0e5","tertiary-fixed":"#ffd9e2","on-tertiary-container":"#ffbdcf","surface":"#f6fbf0","surface-dim":"#d6dcd1","tertiary-fixed-dim":"#ffb1c7","surface-container-highest":"#dfe4d9","on-surface-variant":"#40493d","secondary-fixed":"#c8ecc0"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-md":"1rem","space-lg":"1.5rem","space-sm":"0.5rem","space-xs":"0.25rem","gutter":"1rem","margin":"1.5rem","space-xl":"2rem"},"fontFamily":{"label-sm":["Poppins"],"body-md":["Poppins"],"headline-lg":["Poppins"]},"fontSize":{"label-sm":["12px",{"lineHeight":"16px","fontWeight":"500"}],"body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}],"headline-lg":["32px",{"lineHeight":"40px","fontWeight":"600"}]}}}}</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="bg-primary text-on-primary"></div><div class="bg-surface-container-lowest"></div></header><main class="w-full pt-28 bg-background min-h-screen"><div class="flex flex-col w-full">
+<div class="w-full px-margin py-space-lg flex flex-col gap-space-lg max-w-7xl mx-auto">
+<!-- Banner Superior Informativo -->
+<section class="bg-surface-container-low rounded-xl p-space-md shadow-sm relative overflow-hidden">
+<div class="flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest text-tertiary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">tune</span>
+</div>
+<div class="flex-1 flex flex-col gap-space-xs">
+<h2 class="font-headline-lg text-body-md font-semibold text-on-surface">Configuración Central de Operaciones, Pagos &amp; Fudo</h2>
+<ul class="flex flex-col gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<li class="flex items-start gap-space-xs">
+<span class="text-primary font-bold">•</span>
+<span class=""><strong class="font-medium text-on-surface">Radio y Costo de Envío:</strong> Definí el costo que se suma automáticamente al total en checkout y el radio máximo en kilómetros (desde Salvador Soreda 6140, Wilde).</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="text-primary font-bold">•</span>
+<span class=""><strong class="font-medium text-on-surface">Cobros Mercado Pago / Transferencia:</strong> Podés definir tu Alias para que el cliente lo copie en 1 clic y transfiera, o vincular tu Access Token para habilitar el botón oficial de Mercado Pago Checkout Pro.</span>
+</li>
+<li class="flex items-start gap-space-xs">
+<span class="text-primary font-bold">•</span>
+<span class=""><strong class="font-medium text-on-surface">Integración Sistema Fudo:</strong> Pizza Zeka envía automáticamente los pedidos entrantes a Fudo en tiempo real si tenés una cuenta activa con Plan Pro gastronómico.</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Grilla Principal a 2 Columnas -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Columna Izquierda: Costos de Envío & Medios de Pago -->
+<section class="lg:col-span-6 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">two_wheeler</span>
+<h3 class="font-headline-lg text-body-md font-semibold text-on-surface">Costos de Envío &amp; Medios de Pago</h3>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Parámetros que aplican en el carrito y checkout de tus clientes.</p>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-medium">Delivery &amp; Checkout</span>
+</div>
+<form class="flex flex-col gap-space-md mt-space-xs" id="shipping-payment-form">
+<!-- Fila de Costo y Radio -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="delivery-cost">
+                Costo Fijo de Envío ($ ARS)
+              </label>
+<div class="relative flex items-center">
+<span class="absolute left-3 font-body-md text-on-surface-variant">$</span>
+<input class="w-full bg-surface-container-low pl-8 pr-3 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="delivery-cost" type="number" value="2000">
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Se suma al seleccionar Delivery</span>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="delivery-radius">
+                Radio Máximo (Kilómetros)
+              </label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low px-3 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="delivery-radius" step="0.5" type="number" value="3">
+<span class="absolute right-3 font-label-sm text-label-sm text-on-surface-variant">km</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Desde Wilde (Salvador Soreda)</span>
+</div>
+</div>
+<!-- Alias de Cobro -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="alias-input">
+                Alias de Cobro (1 Clic Copiar)
+              </label>
+<button class="font-label-sm text-label-sm text-primary font-medium hover:underline flex items-center gap-1" id="copy-alias-btn" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span id="copy-alias-label" class="">Copiar de prueba</span>
+</button>
+</div>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low px-3 py-2.5 rounded-lg text-on-surface font-body-md font-medium tracking-wider uppercase focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="alias-input" type="text" value="PIZZA.ZEKA.MP">
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Aparece en la pantalla del cliente para transferir</span>
+</div>
+<!-- Titular de la cuenta -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="account-holder">
+              Titular de la Cuenta
+            </label>
+<input class="w-full bg-surface-container-low px-3 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="account-holder" type="text" value="Pizza Zeka SRL">
+</div>
+<!-- CBU / CVU -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="cbu-input">
+              CBU / CVU (Opcional)
+            </label>
+<input class="w-full bg-surface-container-low px-3 py-2.5 rounded-lg text-on-surface font-body-md tracking-wider focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="cbu-input" type="text" value="0000003100012345678901">
+</div>
+<!-- Mercado Pago Access Token -->
+<div class="flex flex-col gap-1.5 pt-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="mp-token">
+                Mercado Pago Access Token (Checkout Pro)
+              </label>
+<span class="px-space-xs py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm text-[10px] font-medium">Producción</span>
+</div>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low pl-3 pr-10 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all tracking-widest" id="mp-token" type="password" value="APP_USR-82736481928374-091219-c9e83a4f891b2c4d6e8a01f-29837482">
+<button aria-label="Ver token" class="absolute right-2.5 text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1" id="toggle-mp-token" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Credenciales de producción de Developers Mercado Pago. Si está configurado, habilita el botón de pago con tarjeta/saldo MP.</span>
+</div>
+</form>
+</section>
+<!-- Columna Derecha: Sistema Gastronómico Fudo -->
+<section class="lg:col-span-6 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+<!-- Encabezado con Switch -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">restaurant</span>
+</div>
+<h3 class="font-headline-lg text-body-md font-semibold text-on-surface">Sistema Gastronómico Fudo</h3>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="fudo-sync-toggle" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant -mt-space-xs">Sincronización directa de pedidos entrantes hacia tu comanda y punto de venta Fudo.</p>
+<!-- Inputs de Fudo -->
+<div class="flex flex-col gap-space-md mt-space-xs">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="fudo-token">
+                API Token de Fudo *
+              </label>
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-low pl-3 pr-10 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all tracking-wider" id="fudo-token" type="password" value="fudo_sec_live_94827d09b62a4fa9c1">
+<button aria-label="Ver token Fudo" class="absolute right-2.5 text-on-surface-variant hover:text-on-surface flex items-center justify-center p-1" id="toggle-fudo-token" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm font-medium text-on-surface uppercase tracking-wide" for="fudo-branch-id">
+                ID de Sucursal / Local Fudo
+              </label>
+<input class="w-full bg-surface-container-low px-3 py-2.5 rounded-lg text-on-surface font-body-md focus:bg-surface-container-lowest outline-none shadow-sm transition-all" id="fudo-branch-id" type="text" value="14820">
+</div>
+<!-- Estado de conexión -->
+<div class="flex items-center justify-between p-space-sm bg-surface-container rounded-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm font-medium text-on-surface">Webhook Comandero Fudo</span>
+</div>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-medium">Activo · Ping 82ms</span>
+</div>
+<!-- Recuadro de Instrucciones / Alerta Fudo -->
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs text-on-surface font-medium font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-tertiary text-[18px]">warning</span>
+<span class="">Requisitos de Fudo para integración de Web Propia:</span>
+</div>
+<ol class="flex flex-col gap-1.5 pl-5 list-decimal font-label-sm text-label-sm text-on-surface-variant">
+<li class="">Tu cuenta de Fudo debe tener contratado el <strong class="text-on-surface font-medium">Plan Pro</strong>.</li>
+<li class="">Debés enviar un correo a <span class="px-1.5 py-0.5 rounded bg-surface-container font-mono text-on-surface">integraciones-oficiales@fu.do</span> solicitando la activación de la API para tu <em class="text-on-surface">"Sitio Web Propio"</em>.</li>
+<li class="">Una vez habilitado por su equipo de soporte, te brindarán el token de autorización que pegás en el campo superior.</li>
+</ol>
+</div>
+</div>
+</div>
+<!-- Módulo de Ayuda y Soporte Rápido -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-surface-container-highest text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-label-sm font-medium text-on-surface">¿Problemas con la configuración?</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Asistencia técnica directa con el equipo de JustFood</span>
+</div>
+</div>
+<a class="px-space-md py-space-xs rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-medium flex items-center gap-1 hover:opacity-90 transition-opacity" href="https://wa.me/541170726537" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span class="">Ayuda</span>
+</a>
+</div>
+</section>
+</div>
+<!-- Barra Inferior de Acción y Guardado -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span id="last-sync-text" class="">Última sincronización guardada: Hoy a las 18:42 hs</span>
+</div>
+<div class="flex items-center gap-space-sm w-full sm:w-auto">
+<button class="flex-1 sm:flex-none px-space-md py-2.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-medium transition-colors" id="discard-btn" type="button">
+          Descartar Cambios
+        </button>
+<button class="flex-1 sm:flex-none px-space-lg py-2.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-medium flex items-center justify-center gap-2 hover:opacity-95 shadow-sm transition-all active:scale-[0.98]" id="save-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span id="save-btn-text" class="">Guardar Configuración</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    // Alternar visibilidad de Mercado Pago Token
+    const toggleMpBtn = document.getElementById('toggle-mp-token');
+    const mpTokenInput = document.getElementById('mp-token');
+    if (toggleMpBtn && mpTokenInput) {
+      toggleMpBtn.addEventListener('click', () => {
+        const isPassword = mpTokenInput.type === 'password';
+        mpTokenInput.type = isPassword ? 'text' : 'password';
+        const icon = toggleMpBtn.querySelector('span');
+        if (icon) icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    // Alternar visibilidad de Fudo API Token
+    const toggleFudoBtn = document.getElementById('toggle-fudo-token');
+    const fudoTokenInput = document.getElementById('fudo-token');
+    if (toggleFudoBtn && fudoTokenInput) {
+      toggleFudoBtn.addEventListener('click', () => {
+        const isPassword = fudoTokenInput.type === 'password';
+        fudoTokenInput.type = isPassword ? 'text' : 'password';
+        const icon = toggleFudoBtn.querySelector('span');
+        if (icon) icon.textContent = isPassword ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    // Copiar Alias de cobro
+    const copyAliasBtn = document.getElementById('copy-alias-btn');
+    const aliasInput = document.getElementById('alias-input');
+    const copyAliasLabel = document.getElementById('copy-alias-label');
+    if (copyAliasBtn && aliasInput && copyAliasLabel) {
+      copyAliasBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(aliasInput.value).then(() => {
+          copyAliasLabel.textContent = '¡Copiado!';
+          setTimeout(() => {
+            copyAliasLabel.textContent = 'Copiar de prueba';
+          }, 2000);
+        }).catch(() => {
+          aliasInput.select();
+        });
+      });
+    }
+
+    // Acción de Guardado
+    const saveBtn = document.getElementById('save-btn');
+    const saveBtnText = document.getElementById('save-btn-text');
+    const lastSyncText = document.getElementById('last-sync-text');
+    if (saveBtn && saveBtnText && lastSyncText) {
+      saveBtn.addEventListener('click', () => {
+        saveBtn.disabled = true;
+        saveBtnText.textContent = 'Guardando...';
+        setTimeout(() => {
+          const now = new Date();
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          lastSyncText.textContent = `Última sincronización guardada: Hoy a las ${hours}:${minutes} hs`;
+          saveBtnText.textContent = '¡Configuración Guardada!';
+          setTimeout(() => {
+            saveBtnText.textContent = 'Guardar Configuración';
+            saveBtn.disabled = false;
+          }, 2000);
+        }, 600);
+      });
+    }
+
+    // Descartar cambios
+    const discardBtn = document.getElementById('discard-btn');
+    if (discardBtn) {
+      discardBtn.addEventListener('click', () => {
+        document.getElementById('delivery-cost').value = '2000';
+        document.getElementById('delivery-radius').value = '3';
+        document.getElementById('alias-input').value = 'PIZZA.ZEKA.MP';
+        document.getElementById('account-holder').value = 'Pizza Zeka SRL';
+        document.getElementById('cbu-input').value = '0000003100012345678901';
+        document.getElementById('fudo-branch-id').value = '14820';
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container py-space-sm shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="w-full px-margin flex flex-col md:flex-row items-center justify-between gap-space-xs font-label-sm text-label-sm text-on-surface-variant"><div><span class="">• Creado y desarrollado por Just Create • Sucursal Wilde | v4.18.2-stable</span></div><div class="flex flex-wrap items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="">WhatsApp API: Conectado</span></div><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="">Impresora Térmica (80mm): Online</span></div><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="">Fudo Sync: Sincronizado</span></div><div class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-primary"></span><span class="">Sync: 12ms</span></div></div></div></footer>
+
+</body></html>
