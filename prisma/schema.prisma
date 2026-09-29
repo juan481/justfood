@@ -16,7 +16,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Supabase's transaction-mode pooler (port 6543) — what the app talks to
+  // at runtime — doesn't support prepared statements, so `directUrl` (the
+  // session-mode pooler on 5432, same host) is what `prisma db push` /
+  // `migrate` actually use instead. Without this split, db push hangs
+  // silently against the transaction pooler.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
