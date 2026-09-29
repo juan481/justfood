@@ -9,6 +9,12 @@ export default withAuth({
   pages: {
     signIn: '/login',
   },
+  callbacks: {
+    authorized: ({ token, req }) => {
+      const path = req.nextUrl.pathname;
+      return path === '/' || path === '/landing' || !!token;
+    },
+  },
 });
 
 // Gates PAGE routes only. /api/v1/public/* handles its own auth (per-tenant

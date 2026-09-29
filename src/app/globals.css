@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 @tailwind base;
@@ -33,3 +33,13 @@
 .custom-scrollbar-dark::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.25);
 }
+
+@keyframes landing-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-rise { animation: landing-rise .55s ease-out both; }
+.landing-rise:nth-child(2) { animation-delay: .08s; }
+.landing-rise:nth-child(3) { animation-delay: .16s; }
+.landing-rise:nth-child(4) { animation-delay: .24s; }

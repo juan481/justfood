@@ -14,7 +14,7 @@ interface AppHeaderProps {
 }
 
 const NAV_ITEMS: { key: AppHeaderProps['activeNav']; label: string; icon: string; href: string | null }[] = [
-  { key: 'home', label: 'Inicio', icon: 'home', href: '/' },
+  { key: 'home', label: 'Inicio', icon: 'home', href: '/panel' },
   { key: 'kds', label: 'Comandero & Cocina', icon: 'receipt_long', href: '/kds' },
   { key: 'cadetes', label: 'Cadetes & Repartidores', icon: 'moped', href: '/cadetes' },
   { key: 'menu', label: 'Menú & Stock', icon: 'menu_book', href: '/menu' },
@@ -63,7 +63,7 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
   return (
     <header className="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white shadow-xl shadow-command-950/25 sticky top-0 z-50">
       <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-3 min-w-0 shrink-0">
+        <Link href="/panel" className="flex items-center gap-3 min-w-0 shrink-0">
           <Image src="/logo-justfood-icon.png" alt="JustFood" width={40} height={40} className="w-10 h-10 rounded-xl shrink-0" priority />
           <div className="flex items-baseline gap-0.5 font-extrabold text-lg shrink-0">
             <span>Just</span>
