@@ -97,7 +97,10 @@ export default function LoginPage() {
         </div>
 
         <div className="flex items-center justify-between pt-6 border-t border-white/10 relative z-10">
-          <span className="text-xs text-white/40">JustFood — Gestión Gastronómica</span>
+          <a href="/landing" className="inline-flex items-center gap-1.5 text-xs text-white/55 transition-colors hover:text-limeaccent">
+            <span className="material-symbols-rounded text-sm">arrow_back</span>
+            Volver a la página principal
+          </a>
           <span className="text-xs text-white/30">© 2026</span>
         </div>
       </div>
@@ -187,7 +190,6 @@ export default function LoginPage() {
               <a href="/landing" className="inline-flex items-center gap-1 text-xs font-semibold text-command-800 hover:underline">
                 <span className="material-symbols-rounded text-sm">arrow_back</span>
                 Volver a la página principal
-                <Image src="/just-create-logo.png" alt="Just Create" width={137} height={54} className="h-6 w-auto" />
               </a>
             </div>
 
@@ -199,7 +201,7 @@ export default function LoginPage() {
                 className="inline-flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-command-800 transition-colors"
               >
                 <span>Desarrollado y diseñado por</span>
-                <span className="font-semibold text-limeaccent bg-command-950 px-1.5 py-0.5 rounded">Just Create</span>
+                <img src="https://crm.justcreate.com.ar/just-create-logo.png" alt="Just Create" className="h-6 w-auto" />
               </a>
             </div>
           </div>
