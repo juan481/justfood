@@ -183,6 +183,14 @@ export default function LoginPage() {
               <p className="text-xs text-slate-400">¿Problemas para acceder? Consultá con tu encargado.</p>
             </div>
 
+            <div className="mt-3 text-center">
+              <a href="/landing" className="inline-flex items-center gap-1 text-xs font-semibold text-command-800 hover:underline">
+                <span className="material-symbols-rounded text-sm">arrow_back</span>
+                Volver a la página principal
+                <Image src="/just-create-logo.png" alt="Just Create" width={137} height={54} className="h-6 w-auto" />
+              </a>
+            </div>
+
             <div className="mt-6 pt-5 flex items-center justify-center border-t border-slate-50">
               <a
                 href="https://justcreate.com.ar"

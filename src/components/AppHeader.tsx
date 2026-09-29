@@ -62,7 +62,8 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
 
   return (
     <header className="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white shadow-xl shadow-command-950/25 sticky top-0 z-50">
-      <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-4 px-4 py-3">
+      <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-3 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
         <Link href="/panel" className="flex items-center gap-3 min-w-0 shrink-0">
           <Image src="/logo-justfood-icon.png" alt="JustFood" width={40} height={40} className="w-10 h-10 rounded-xl shrink-0" priority />
           <div className="flex items-baseline gap-0.5 font-extrabold text-lg shrink-0">
@@ -70,17 +71,17 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
             <span className="text-limeaccent">Food</span>
           </div>
         </Link>
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="hidden sm:block w-px h-6 bg-white/20 shrink-0" />
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-command-700/60 text-xs font-semibold truncate">
+        <div className="hidden min-w-0 items-center gap-2 border-l border-white/20 pl-3 sm:flex">
+          <span className="flex h-10 min-w-[40px] max-w-[150px] items-center justify-center overflow-hidden rounded-xl bg-white/10 px-1.5">
             {tenantLogoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={tenantLogoUrl} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+              <img src={tenantLogoUrl} alt="Logo del local" className="h-8 max-w-[132px] w-auto object-contain" />
             ) : (
               '🍕'
             )}
-            {tenantName}
           </span>
+          <span className="max-w-[160px] truncate text-sm font-bold text-white">{tenantName}</span>
+        </div>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -115,7 +116,7 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
       </div>
 
       <nav className="bg-black/15 border-t border-white/10">
-        <div className="max-w-[1920px] mx-auto flex items-center gap-2 overflow-x-auto custom-scrollbar px-4 py-2">
+        <div className="max-w-[1920px] mx-auto flex items-center gap-1 overflow-x-auto custom-scrollbar px-3 py-2 xl:justify-between">
           {NAV_ITEMS.map((item) => {
             const isActive = item.key === activeNav;
             const className = `inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
