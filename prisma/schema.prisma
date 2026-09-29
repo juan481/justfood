@@ -32,6 +32,16 @@ model Tenant {
   name      String
   timezone  String   @default("America/Argentina/Buenos_Aires")
   status    String   @default("active")
+  // Atomic per-tenant order counter — an `increment` UPDATE row-locks in
+  // Postgres, so two orders created at the same instant (web + mostrador +
+  // WhatsApp channels can all fire at once) still get distinct sequential
+  // codes instead of racing on a separate COUNT(*) read (see createOrder()).
+  orderSeq  Int      @default(0)
+  // Tenant's own brand mark — a compressed data URL (same pattern as
+  // PaymentReceipt.imageUrl), not a file path, so it needs no separate
+  // storage service. Shown in the header, Home, and the printed comanda
+  // instead of JustFood's own logo, once a tenant uploads one.
+  logoUrl   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

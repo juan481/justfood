@@ -61,6 +61,7 @@ export function NewOrderModal({ onClose, onCreated }: NewOrderModalProps) {
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
 
   const [orderKind, setOrderKind] = useState<OrderKind>('delivery');
+  const [channel, setChannel] = useState<'MOSTRADOR' | 'WHATSAPP'>('MOSTRADOR');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -163,7 +164,7 @@ export function NewOrderModal({ onClose, onCreated }: NewOrderModalProps) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        channel: 'MOSTRADOR',
+        channel,
         items: cart.map((l) => ({ productId: l.productId, quantity: l.quantity, notes: l.note || undefined })),
         customer_name: customerName || undefined,
         customer_phone: customerPhone || undefined,
@@ -241,6 +242,26 @@ export function NewOrderModal({ onClose, onCreated }: NewOrderModalProps) {
               size, so switching category never resizes the modal around it. */}
           <div className="min-w-0 min-h-0 overflow-y-auto custom-scrollbar p-4 space-y-4">
             <div className="space-y-2">
+              <div className="flex items-center gap-1.5 bg-slate-100 rounded-xl p-1 w-fit">
+                <button
+                  onClick={() => setChannel('MOSTRADOR')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    channel === 'MOSTRADOR' ? 'bg-white text-command-950 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <span className="material-symbols-rounded text-sm">storefront</span>
+                  Mostrador / Teléfono
+                </button>
+                <button
+                  onClick={() => setChannel('WHATSAPP')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    channel === 'WHATSAPP' ? 'bg-white text-command-950 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <span className="material-symbols-rounded text-sm">chat</span>
+                  WhatsApp
+                </button>
+              </div>
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold uppercase tracking-wide text-slate-500">Datos del destino & cliente</h3>
                 {frequentInfo && (

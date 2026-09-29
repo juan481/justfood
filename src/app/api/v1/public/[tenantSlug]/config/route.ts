@@ -24,6 +24,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ten
     ok: true,
     whatsapp_number: settingsMap.whatsapp_number ?? null,
     business_name: settingsMap.business_name ?? tenant.name,
+    logo_url: tenant.logoUrl ?? null,
     address: branch?.address ?? null,
     business_hours: settingsMap.business_hours ? JSON.parse(settingsMap.business_hours) : null,
     delivery_cost: deliveryZone?.cost ?? null,

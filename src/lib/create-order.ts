@@ -35,11 +35,6 @@ export class DuplicateOrderError extends Error {
   }
 }
 
-async function nextOrderCode(tenantId: string): Promise<string> {
-  const count = await prisma.order.count({ where: { tenantId } });
-  return `JF-${String(count + 1).padStart(5, '0')}`;
-}
-
 export async function createOrder(input: CreateOrderInput) {
   if (input.idempotencyKey) {
     const existing = await prisma.order.findUnique({
@@ -56,9 +51,17 @@ export async function createOrder(input: CreateOrderInput) {
     ? OrderStatus.EN_ESPERA_PAGO
     : OrderStatus.NUEVO;
 
-  const orderCode = await nextOrderCode(input.tenantId);
-
   const order = await prisma.$transaction(async (tx) => {
+    // `orderSeq` increment is a single row-locked UPDATE — two orders
+    // created in the same instant (web + mostrador + WhatsApp can all fire
+    // concurrently) still serialize on this row and get distinct codes,
+    // unlike a separate COUNT(*) read which both could see identically.
+    const tenant = await tx.tenant.update({
+      where: { id: input.tenantId },
+      data: { orderSeq: { increment: 1 } },
+    });
+    const orderCode = `JF-${String(tenant.orderSeq).padStart(5, '0')}`;
+
     const created = await tx.order.create({
       data: {
         tenantId: input.tenantId,

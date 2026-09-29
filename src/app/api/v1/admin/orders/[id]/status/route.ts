@@ -61,6 +61,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (courier) courierName = `${courier.firstName} ${courier.lastName}`;
   }
 
+  // Reassigning to a different courier mid-REPARTO used to leave the old one
+  // stuck EN_VIAJE forever — the ENTREGADO branch below only ever freed
+  // `existing.courierId`, never the newly-picked one, and a swap-then-deliver
+  // in the same call never touched the old courier at all.
+  const previousCourierId = existing.courierId;
+  const swapped = Boolean(previousCourierId && courierId && previousCourierId !== courierId);
+  const finalCourierId = courierId ?? previousCourierId ?? undefined;
+
   const [order] = await prisma.$transaction([
     prisma.order.update({
       where: { id },
@@ -81,13 +89,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       },
     }),
     // A courier moving into REPARTO is now "on a trip"; landing on
-    // ENTREGADO frees them up again — both reflected live on the Cadetes
-    // screen and the KDS courier-count badge.
-    ...(courierId && toStatus === 'REPARTO'
-      ? [prisma.courier.update({ where: { id: courierId }, data: { status: 'EN_VIAJE' } })]
+    // ENTREGADO frees the one actually on the order (not necessarily the
+    // one from before, if it was swapped in this same call) — both
+    // reflected live on the Cadetes screen and the KDS courier-count badge.
+    ...(swapped ? [prisma.courier.update({ where: { id: previousCourierId! }, data: { status: 'DISPONIBLE' } })] : []),
+    ...(finalCourierId && toStatus === 'REPARTO'
+      ? [prisma.courier.update({ where: { id: finalCourierId }, data: { status: 'EN_VIAJE' } })]
       : []),
-    ...(existing.courierId && toStatus === 'ENTREGADO'
-      ? [prisma.courier.update({ where: { id: existing.courierId }, data: { status: 'DISPONIBLE' } })]
+    ...(finalCourierId && toStatus === 'ENTREGADO'
+      ? [prisma.courier.update({ where: { id: finalCourierId }, data: { status: 'DISPONIBLE' } })]
       : []),
   ]);
 

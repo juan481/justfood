@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { formatPesos } from '@/lib/format';
+import { formatPesos, waLink } from '@/lib/format';
 import type { Order, OrderStatus } from '@/types/order';
 
 const NEXT_STATUS: Partial<Record<OrderStatus, { label: string; status: OrderStatus }>> = {
@@ -108,7 +108,7 @@ export function OrderDetailDrawer({ order, onClose, onAdvance, onCancel }: Props
             </div>
             {order.customerPhone && (
               <a
-                href={`https://wa.me/54${order.customerPhone.replace(/\D/g, '')}`}
+                href={waLink(order.customerPhone)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold hover:bg-emerald-100 transition-colors shrink-0"

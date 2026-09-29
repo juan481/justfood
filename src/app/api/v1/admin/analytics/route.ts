@@ -67,12 +67,24 @@ export async function GET(req: NextRequest) {
   const [visitsToday, visitsThisMonth, ordersThisMonth, allOrdersForRanking] = await Promise.all([
     prisma.pageView.count({ where: { tenantId: session.user.tenantId, createdAt: { gte: startOfTodayAR() } } }),
     prisma.pageView.count({ where: { tenantId: session.user.tenantId, createdAt: { gte: startOfMonth } } }),
+    // `not: 'CANCELADO'` alone still counts EN_ESPERA_PAGO — a transferencia/MP
+    // order sitting in the Pagos por Revisar queue, not yet confirmed as an
+    // actual sale (it might get rejected). Counting it here would overstate
+    // this month's revenue and a customer's real spend with unconfirmed money.
     prisma.order.findMany({
-      where: { tenantId: session.user.tenantId, createdAt: { gte: startOfMonth }, status: { not: 'CANCELADO' } },
+      where: {
+        tenantId: session.user.tenantId,
+        createdAt: { gte: startOfMonth },
+        status: { notIn: ['CANCELADO', 'EN_ESPERA_PAGO'] },
+      },
       select: { totalAmount: true },
     }),
     prisma.order.findMany({
-      where: { tenantId: session.user.tenantId, customerPhone: { not: null }, status: { not: 'CANCELADO' } },
+      where: {
+        tenantId: session.user.tenantId,
+        customerPhone: { not: null },
+        status: { notIn: ['CANCELADO', 'EN_ESPERA_PAGO'] },
+      },
       select: { customerPhone: true, customerName: true, address: true, locality: true, totalAmount: true, createdAt: true },
       orderBy: { createdAt: 'desc' },
     }),

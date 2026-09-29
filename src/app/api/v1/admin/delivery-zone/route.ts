@@ -25,11 +25,16 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'cost inválido' }, { status: 400 });
   }
 
+  // `body.radiusKm ?? undefined` would silently no-op on an explicit `null`
+  // (clearing the field) — `??` treats null and undefined the same, so a
+  // staff member clearing the radius input never actually persisted it.
+  const radiusKm = body.radiusKm === undefined ? undefined : body.radiusKm;
+
   const existing = await prisma.deliveryZone.findFirst({ where: { tenantId: session.user.tenantId, isActive: true } });
   if (existing) {
     const zone = await prisma.deliveryZone.update({
       where: { id: existing.id },
-      data: { cost: Math.round(cost), radiusKm: body.radiusKm ?? undefined },
+      data: { cost: Math.round(cost), radiusKm },
     });
     return NextResponse.json({ ok: true, cost: zone.cost, radiusKm: zone.radiusKm });
   }

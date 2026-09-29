@@ -4,11 +4,18 @@
 // the alert entirely.
 let cachedAudio: HTMLAudioElement | null = null;
 
+// HTMLAudioElement defaults to volume 1.0 (max) — never explicitly set
+// before, so every alert played at full blast regardless of the device's
+// own volume. 0.45 keeps it clearly audible in a kitchen without being
+// jarring on a phone/tablet held closer to someone's ear.
+const CHIME_VOLUME = 0.45;
+
 export function playNewOrderChime() {
   try {
     if (!cachedAudio) {
       cachedAudio = new Audio('/sounds/new-order.mp3');
     }
+    cachedAudio.volume = CHIME_VOLUME;
     cachedAudio.currentTime = 0;
     cachedAudio.play().catch(() => playFallbackChime());
   } catch {
@@ -28,7 +35,7 @@ function playFallbackChime() {
       osc.type = 'sine';
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0, now + i * 0.15);
-      gain.gain.linearRampToValueAtTime(0.25, now + i * 0.15 + 0.02);
+      gain.gain.linearRampToValueAtTime(CHIME_VOLUME * 0.4, now + i * 0.15 + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.25);
       osc.connect(gain).connect(ctx.destination);
       osc.start(now + i * 0.15);

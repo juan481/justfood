@@ -181,7 +181,7 @@ export default function KdsPage() {
             <span className="w-11 h-11 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 animate-pulse">
               <span className="material-symbols-rounded text-white text-xl">notifications_active</span>
             </span>
-            <div className="flex-1 min-w-[240px]">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-extrabold text-sm text-red-600">🔔 ¡NUEVO PEDIDO ENTRANTE!</span>
                 <span className="font-mono text-xs font-bold text-command-800">#{alertOrder.orderCode.replace(/^\D+-?0*/, '')}</span>

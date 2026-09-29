@@ -13,6 +13,14 @@ export async function releaseOrderToKitchen(
   paymentStatus: string,
   changedByUserId?: string
 ) {
+  // Both current callers already resolve orderId through a tenant-scoped
+  // lookup before calling this, but `update` can't filter by tenantId
+  // directly (id is the only unique key on Order) — this re-check keeps
+  // the guarantee local to the function instead of relying on every future
+  // caller remembering to pre-validate it themselves.
+  const owned = await prisma.order.findFirst({ where: { id: orderId, tenantId } });
+  if (!owned) throw new Error(`Pedido ${orderId} no pertenece al tenant ${tenantId}`);
+
   const order = await prisma.order.update({
     where: { id: orderId },
     data: { status: OrderStatus.NUEVO, paymentStatus, version: { increment: 1 } },

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { AppHeader } from '@/components/AppHeader';
 import { Footer } from '@/components/Footer';
 import { GuideCard } from '@/components/GuideCard';
-import { formatPesos } from '@/lib/format';
+import { formatPesos, waLink } from '@/lib/format';
 
 interface Analytics {
   days: number;
@@ -134,7 +134,7 @@ export default function EstadisticasPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto animate-in fade-in">
               <div className="p-5 pb-3 flex items-center justify-between">
                 <div>
                   <h2 className="font-bold text-sm text-slate-700 flex items-center gap-1.5">
@@ -169,7 +169,7 @@ export default function EstadisticasPage() {
                       <td className="px-4 py-2.5 text-right font-mono text-emerald-600 font-semibold">{formatPesos(c.total)}</td>
                       <td className="px-4 py-2.5 text-right">
                         <a
-                          href={`https://wa.me/54${c.phone.replace(/\D/g, '')}`}
+                          href={waLink(c.phone)}
                           target="_blank"
                           rel="noreferrer"
                           className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold transition-colors"
@@ -191,7 +191,7 @@ export default function EstadisticasPage() {
               </table>
             </div>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-in fade-in">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-x-auto animate-in fade-in">
               <div className="p-5 pb-3">
                 <h2 className="font-bold text-sm text-slate-700 flex items-center gap-1.5">
                   <span className="material-symbols-rounded text-base text-slate-500">history</span>

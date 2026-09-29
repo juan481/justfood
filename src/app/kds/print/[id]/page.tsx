@@ -13,6 +13,8 @@ export default function PrintTicketPage() {
   const params = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState('');
 
   useEffect(() => {
     fetch(`/api/v1/admin/orders/${params.id}`)
@@ -22,6 +24,18 @@ export default function PrintTicketPage() {
         else setError(data.error || 'Pedido no encontrado');
       });
   }, [params.id]);
+
+  useEffect(() => {
+    fetch('/api/v1/admin/business-info')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok) {
+          setLogoUrl(d.logoUrl ?? null);
+          setBusinessName(d.businessName ?? '');
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (order) {
@@ -45,7 +59,11 @@ export default function PrintTicketPage() {
       `}</style>
 
       <div className="text-center space-y-0.5 mb-2">
-        <div className="font-bold text-sm">JustFood</div>
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="" className="w-10 h-10 mx-auto rounded-lg object-cover mb-1" />
+        )}
+        <div className="font-bold text-sm">{businessName || 'Comanda de Cocina'}</div>
         <div className="text-[10px]">Comanda de cocina</div>
       </div>
       <div className="border-t border-dashed border-black my-1" />

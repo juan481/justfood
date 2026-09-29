@@ -12,17 +12,20 @@ export async function GET() {
   const session = await requireSession();
   if (!session) return NextResponse.json({ ok: false, error: 'No autorizado' }, { status: 401 });
 
-  const [branch, hoursSetting] = await Promise.all([
+  const [tenant, branch, hoursSetting] = await Promise.all([
+    prisma.tenant.findUnique({ where: { id: session.user.tenantId } }),
     resolveDefaultBranch(session.user.tenantId),
     prisma.tenantSetting.findUnique({ where: { tenantId_key: { tenantId: session.user.tenantId, key: 'business_hours' } } }),
   ]);
 
   return NextResponse.json({
     ok: true,
+    businessName: tenant?.name ?? '',
     address: branch?.address ?? '',
     lat: branch?.lat ?? null,
     lng: branch?.lng ?? null,
     businessHours: hoursSetting?.value ? JSON.parse(hoursSetting.value) : null,
+    logoUrl: tenant?.logoUrl ?? null,
   });
 }
 
@@ -51,6 +54,9 @@ export async function PUT(req: NextRequest) {
           update: { value: JSON.stringify(body.businessHours) },
           create: { tenantId: session.user.tenantId, key: 'business_hours', value: JSON.stringify(body.businessHours) },
         })
+      : Promise.resolve(),
+    typeof body.logoUrl === 'string'
+      ? prisma.tenant.update({ where: { id: session.user.tenantId }, data: { logoUrl: body.logoUrl || null } })
       : Promise.resolve(),
   ]);
 

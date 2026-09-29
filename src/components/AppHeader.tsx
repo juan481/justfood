@@ -36,6 +36,7 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
   // shows "how many pedidos/pagos are waiting" in the nav, not just the
   // page that happens to already load that data for its own content.
   const [badges, setBadges] = useState({ activeOrders: 0, pendingPaymentReviews: 0 });
+  const [tenantLogoUrl, setTenantLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const load = () =>
@@ -48,6 +49,15 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
     load();
     const interval = setInterval(load, 20000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/v1/admin/business-info')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok) setTenantLogoUrl(d.logoUrl ?? null);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -63,7 +73,13 @@ export function AppHeader({ tenantName, activeNav, soundEnabled, onToggleSound, 
         <div className="flex items-center gap-3 min-w-0">
           <div className="hidden sm:block w-px h-6 bg-white/20 shrink-0" />
           <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-command-700/60 text-xs font-semibold truncate">
-            🍕 {tenantName}
+            {tenantLogoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={tenantLogoUrl} alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
+            ) : (
+              '🍕'
+            )}
+            {tenantName}
           </span>
         </div>
 

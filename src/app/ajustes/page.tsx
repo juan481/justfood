@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AppHeader } from '@/components/AppHeader';
 import { Footer } from '@/components/Footer';
+import { compressImage } from '@/lib/image-compress';
 
 interface DayHours {
   open: string;
@@ -49,6 +50,9 @@ export default function AjustesPage() {
 
   const [address, setAddress] = useState('');
   const [businessHours, setBusinessHours] = useState<WeekHours>(DEFAULT_HOURS);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     Promise.all([
@@ -75,6 +79,7 @@ export default function AjustesPage() {
       if (bi.ok) {
         setAddress(bi.address ?? '');
         setBusinessHours(bi.businessHours ?? DEFAULT_HOURS);
+        setLogoUrl(bi.logoUrl ?? null);
       }
       setLoading(false);
     });
@@ -101,7 +106,7 @@ export default function AjustesPage() {
       fetch('/api/v1/admin/business-info', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, businessHours }),
+        body: JSON.stringify({ address, businessHours, logoUrl: logoUrl ?? '' }),
       }),
     ]);
     if (mpToken) {
@@ -115,6 +120,24 @@ export default function AjustesPage() {
 
   function updateDay(key: string, patch: Partial<DayHours>) {
     setBusinessHours((prev) => ({ ...prev, [key]: { ...prev[key], ...patch } }));
+  }
+
+  async function handleLogoFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setLogoUploading(true);
+    try {
+      // Square-ish icon, so it fits the header/print ticket without
+      // stretching — a bit tighter than the receipt photos' 1000px since a
+      // logo mark never needs to be that large.
+      const dataUrl = await compressImage(file, 400, 0.85);
+      setLogoUrl(dataUrl);
+    } catch {
+      alert('No se pudo procesar la imagen. Probá con otra foto.');
+    } finally {
+      setLogoUploading(false);
+    }
   }
 
   async function saveFudo() {
@@ -169,6 +192,36 @@ export default function AjustesPage() {
                   Datos del Local
                 </h2>
                 <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold">Dirección & Horarios</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                  className="relative w-16 h-16 rounded-2xl border-2 border-dashed border-slate-200 hover:border-command-400 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden transition-colors"
+                  title="Subir logo del local"
+                >
+                  {logoUploading ? (
+                    <span className="w-4 h-4 border-2 border-slate-300 border-t-command-800 rounded-full animate-spin" />
+                  ) : logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={logoUrl} alt="Logo del local" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="material-symbols-rounded text-slate-300 text-2xl">add_photo_alternate</span>
+                  )}
+                </button>
+                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoFile} />
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-slate-600">Logo del Local</p>
+                  <p className="text-[10px] text-slate-400">
+                    Aparece en el encabezado del sistema y en la comanda impresa. Tocá el recuadro para subir uno.
+                  </p>
+                  {logoUrl && (
+                    <button onClick={() => setLogoUrl(null)} className="text-[11px] text-red-500 hover:underline">
+                      Quitar logo
+                    </button>
+                  )}
+                </div>
               </div>
 
               <label className="text-xs text-slate-500 space-y-1 block">

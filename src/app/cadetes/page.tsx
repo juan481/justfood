@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { AppHeader } from '@/components/AppHeader';
 import { Footer } from '@/components/Footer';
 import { GuideCard } from '@/components/GuideCard';
-import { formatPesos } from '@/lib/format';
+import { formatPesos, waLink } from '@/lib/format';
 
 interface Courier {
   id: string;
@@ -241,7 +241,7 @@ export default function CadetesPage() {
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           {c.phone && (
-                            <a href={`https://wa.me/54${c.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-colors">
+                            <a href={waLink(c.phone)} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-colors">
                               <span className="material-symbols-rounded text-base">chat</span>
                             </a>
                           )}
