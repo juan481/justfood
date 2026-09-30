@@ -34,7 +34,47 @@ const NOTES = [
   null,
   null,
 ];
-const COURIERS = ['Lucas Vera (Moto Honda)', 'Emiliano Ríos (Moto Zanella)', 'Brian Soto (Bici)'];
+const DEMO_COURIERS = [
+  { firstName: 'Lucas', lastName: 'Vera', phone: '11 4455-1201', vehicle: 'Moto Honda', plate: 'A123BCD', tariffPerDelivery: 1800 },
+  { firstName: 'Emiliano', lastName: 'Ríos', phone: '11 4455-1202', vehicle: 'Moto Zanella', plate: 'A456EFG', tariffPerDelivery: 1800 },
+  { firstName: 'Brian', lastName: 'Soto', phone: '11 4455-1203', vehicle: 'Bicicleta', plate: null, tariffPerDelivery: 1200 },
+];
+
+const DEMO_CATALOG = [
+  {
+    name: 'Pizzas',
+    products: [
+      ['Muzzarella', 'Salsa de tomate, muzzarella y aceitunas.', 12500],
+      ['Napolitana', 'Tomate fresco, ajo, muzzarella y orégano.', 13800],
+      ['Especial de jamón', 'Muzzarella, jamón cocido y morrones.', 14500],
+      ['Fugazzeta', 'Cebolla caramelizada, muzzarella y orégano.', 14200],
+    ],
+  },
+  {
+    name: 'Empanadas',
+    products: [
+      ['Carne cortada a cuchillo', 'Carne, cebolla, huevo y especias.', 1900],
+      ['Jamón y queso', 'Jamón cocido y muzzarella.', 1800],
+      ['Pollo', 'Pollo desmenuzado, cebolla y morrón.', 1800],
+      ['Verdura y salsa blanca', 'Espinaca, salsa blanca y queso.', 1750],
+    ],
+  },
+  {
+    name: 'Bebidas',
+    products: [
+      ['Gaseosa 1.5 L', 'Coca-Cola, Sprite o Fanta.', 3800],
+      ['Agua mineral 500 ml', 'Sin gas.', 1700],
+      ['Cerveza lata', 'Cerveza rubia 473 ml.', 2900],
+    ],
+  },
+  {
+    name: 'Postres',
+    products: [
+      ['Flan casero', 'Con dulce de leche o crema.', 3200],
+      ['Brownie con helado', 'Brownie tibio y helado de crema.', 4500],
+    ],
+  },
+] as const;
 
 function randomFrom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -56,8 +96,36 @@ async function main() {
   const branch = await prisma.branch.findFirst({ where: { tenantId: tenant.id, isDefault: true } });
   if (!branch) throw new Error('Sin sucursal default.');
 
-  const products = await prisma.product.findMany({ where: { tenantId: tenant.id, isActive: true } });
-  if (products.length === 0) throw new Error('El tenant no tiene productos activos — correr el ETL primero.');
+  let products = await prisma.product.findMany({ where: { tenantId: tenant.id, isActive: true } });
+  if (products.length === 0) {
+    console.log('  catálogo vacío: creando menú genérico de demostración');
+    for (const [sortOrder, categoryData] of DEMO_CATALOG.entries()) {
+      const category = await prisma.category.create({
+        data: { tenantId: tenant.id, name: categoryData.name, sortOrder },
+      });
+      await prisma.product.createMany({
+        data: categoryData.products.map(([name, description, price], productSortOrder) => ({
+          tenantId: tenant.id,
+          categoryId: category.id,
+          name,
+          description,
+          price,
+          sortOrder: productSortOrder,
+        })),
+      });
+    }
+    products = await prisma.product.findMany({ where: { tenantId: tenant.id, isActive: true } });
+    console.log(`  catálogo de demo: ${products.length} productos creados`);
+  }
+
+  let couriers = await prisma.courier.findMany({ where: { tenantId: tenant.id } });
+  if (couriers.length === 0) {
+    await prisma.courier.createMany({
+      data: DEMO_COURIERS.map((courier) => ({ ...courier, tenantId: tenant.id, branchId: branch.id })),
+    });
+    couriers = await prisma.courier.findMany({ where: { tenantId: tenant.id } });
+    console.log(`  cadetes de demo: ${couriers.length} creados`);
+  }
 
   const channels: OrderChannel[] = [OrderChannel.WEB, OrderChannel.MOSTRADOR, OrderChannel.WHATSAPP];
   const paymentMethods = ['efectivo', 'efectivo', 'transferencia', 'mercadopago'];
@@ -105,7 +173,8 @@ async function main() {
       const updatedAt = new Date(createdAt.getTime() + prepMinutes * 60000);
 
       const address = deliveryType === 'delivery' ? `${randomFrom(STREETS)} ${randomInt(100, 6999)}` : null;
-      const courierName = status === OrderStatus.REPARTO && deliveryType === 'delivery' ? randomFrom(COURIERS) : null;
+      const courier = status === OrderStatus.REPARTO && deliveryType === 'delivery' ? randomFrom(couriers) : null;
+      const courierName = courier ? `${courier.firstName} ${courier.lastName} (${courier.vehicle ?? 'Cadete'})` : null;
 
       const order = await prisma.order.create({
         data: {
@@ -124,6 +193,7 @@ async function main() {
           paymentStatus: paymentMethod === 'efectivo' ? 'contra_entrega' : 'pagado',
           totalAmount: subtotal,
           courierName,
+          courierId: courier?.id,
           createdAt,
           updatedAt,
           items: { create: items },
