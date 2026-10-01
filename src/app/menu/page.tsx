@@ -20,6 +20,7 @@ interface Product {
   isFrozen: boolean;
   categoryId: string | null;
   category: Category | null;
+  sortOrder: number;
 }
 
 export default function MenuPage() {
@@ -34,7 +35,6 @@ export default function MenuPage() {
   const [editingDetailsId, setEditingDetailsId] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState('');
   const [descriptionDraft, setDescriptionDraft] = useState('');
-  const [categoryDraft, setCategoryDraft] = useState('');
   const [savingDetails, setSavingDetails] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showNewProduct, setShowNewProduct] = useState(false);
@@ -88,7 +88,6 @@ export default function MenuPage() {
     setEditingDetailsId(product.id);
     setNameDraft(product.name);
     setDescriptionDraft(product.description ?? '');
-    setCategoryDraft(product.categoryId ?? '');
   }
 
   async function saveDetails(product: Product) {
@@ -101,7 +100,7 @@ export default function MenuPage() {
     const res = await fetch(`/api/v1/admin/products/${product.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, description: descriptionDraft.trim() || null, categoryId: categoryDraft || null }),
+      body: JSON.stringify({ name, description: descriptionDraft.trim() || null }),
     });
     const data = await res.json();
     setSavingDetails(false);
@@ -134,6 +133,63 @@ export default function MenuPage() {
     }
   }
 
+  async function updateCategory(product: Product, categoryId: string) {
+    const res = await fetch(`/api/v1/admin/products/${product.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoryId: categoryId || null }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      setProducts((prev) => prev.map((p) => (p.id === product.id ? { ...p, ...data.product } : p)));
+      showToast(`Categoría de "${product.name}" actualizada`);
+    }
+  }
+
+  async function deleteProduct(product: Product) {
+    if (!window.confirm(`¿Eliminar "${product.name}" para siempre? Esto no se puede deshacer — si solo querés ocultarlo de la carta, usá "Pausado" en vez de esto.`)) return;
+    const res = await fetch(`/api/v1/admin/products/${product.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.ok) {
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+      showToast(`"${product.name}" eliminado`);
+    }
+  }
+
+  // Mueve el producto un lugar arriba/abajo dentro de la vista filtrada
+  // actual (misma categoría/búsqueda que se está mirando) y renumera el
+  // orden de todo ese grupo — la mayoría de los productos comparten
+  // sortOrder=0 por default, así que "intercambiar" el valor entre dos que
+  // ya son iguales no movería nada; esto lo deja explícito y estable.
+  async function moveProduct(product: Product, direction: -1 | 1) {
+    const idx = filtered.findIndex((p) => p.id === product.id);
+    const swapIdx = idx + direction;
+    if (idx === -1 || swapIdx < 0 || swapIdx >= filtered.length) return;
+
+    const reordered = filtered.slice();
+    const [moved] = reordered.splice(idx, 1);
+    reordered.splice(swapIdx, 0, moved);
+
+    const changed = reordered
+      .map((p, i) => ({ id: p.id, sortOrder: i, prevSortOrder: p.sortOrder }))
+      .filter((u) => u.sortOrder !== u.prevSortOrder);
+    if (!changed.length) return;
+
+    setProducts((prev) => {
+      const byId = new Map(changed.map((u) => [u.id, u.sortOrder]));
+      return prev.map((p) => (byId.has(p.id) ? { ...p, sortOrder: byId.get(p.id)! } : p));
+    });
+    await Promise.all(
+      changed.map((u) =>
+        fetch(`/api/v1/admin/products/${u.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sortOrder: u.sortOrder }),
+        })
+      )
+    );
+  }
+
   async function createProduct() {
     if (!newName || !newPrice) return;
     setCreating(true);
@@ -162,11 +218,13 @@ export default function MenuPage() {
   }
 
   const filtered = useMemo(() => {
-    return products.filter((p) => {
-      if (categoryFilter !== 'all' && p.categoryId !== categoryFilter) return false;
-      if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
-      return true;
-    });
+    return products
+      .filter((p) => {
+        if (categoryFilter !== 'all' && p.categoryId !== categoryFilter) return false;
+        if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
+        return true;
+      })
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
   }, [products, categoryFilter, search]);
 
   return (
@@ -179,6 +237,8 @@ export default function MenuPage() {
           tips={[
             { icon: 'bolt', title: 'Cambiar precio en 1 clic', body: 'Escribí el nuevo valor directo en el recuadro y presioná Enter o el botón verde. Impacta en vivo.' },
             { icon: 'visibility_off', title: 'Pausar por falta de stock', body: 'Hacé clic en la cápsula En Carta para ocultarlo del cotizador al instante sin borrarlo.' },
+            { icon: 'swap_vert', title: 'Reordenar el menú', body: 'Filtrá por categoría arriba y usá las flechas de la columna "Orden" — ese orden es el que se ve en la web.' },
+            { icon: 'delete', title: 'Eliminar para siempre', body: 'El tacho borra el producto por completo. Si solo le faltó stock, mejor pausalo — se puede reactivar.' },
             { icon: 'add_circle', title: 'Nueva variedad', body: 'Creá pizzas, bebidas o promos con el botón verde. Podés duplicar ingredientes y etiquetas al instante.' },
           ]}
         />
@@ -268,19 +328,20 @@ export default function MenuPage() {
                 <th className="text-right px-4 py-3 font-semibold">Precio</th>
                 <th className="text-center px-4 py-3 font-semibold">Tipo</th>
                 <th className="text-center px-4 py-3 font-semibold">Estado</th>
+                <th className="text-center px-4 py-3 font-semibold">Orden</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                     Cargando...
                   </td>
                 </tr>
               )}
               {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                     Sin productos.
                   </td>
                 </tr>
@@ -304,18 +365,6 @@ export default function MenuPage() {
                           placeholder="Descripción / ingredientes"
                           onKeyDown={(e) => e.key === 'Enter' && saveDetails(p)}
                         />
-                        <select
-                          className="w-full px-2 py-1 border border-slate-200 rounded-lg text-xs text-slate-600 capitalize"
-                          value={categoryDraft}
-                          onChange={(e) => setCategoryDraft(e.target.value)}
-                        >
-                          <option value="">Sin categoría</option>
-                          {categories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
                         <div className="flex gap-1.5">
                           <button
                             onClick={() => saveDetails(p)}
@@ -339,7 +388,20 @@ export default function MenuPage() {
                       </button>
                     )}
                   </td>
-                  <td className="px-4 py-3 hidden md:table-cell capitalize text-slate-500">{p.category?.name ?? '—'}</td>
+                  <td className="px-4 py-3 hidden md:table-cell">
+                    <select
+                      className="capitalize text-slate-600 bg-transparent border border-transparent hover:border-slate-200 rounded-lg px-1.5 py-1 -mx-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-command-800 focus:border-transparent"
+                      value={p.categoryId ?? ''}
+                      onChange={(e) => updateCategory(p, e.target.value)}
+                    >
+                      <option value="">Sin categoría</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
                   <td className="px-4 py-3 text-right font-mono">
                     {editingPriceId === p.id ? (
                       <input
@@ -382,6 +444,33 @@ export default function MenuPage() {
                     >
                       {p.isActive ? 'En Carta' : 'Pausado'}
                     </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-center gap-0.5">
+                      <button
+                        onClick={() => moveProduct(p, -1)}
+                        disabled={filtered.findIndex((x) => x.id === p.id) === 0}
+                        title="Subir (dentro de esta vista/categoría)"
+                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
+                      >
+                        <span className="material-symbols-rounded text-base">arrow_upward</span>
+                      </button>
+                      <button
+                        onClick={() => moveProduct(p, 1)}
+                        disabled={filtered.findIndex((x) => x.id === p.id) === filtered.length - 1}
+                        title="Bajar (dentro de esta vista/categoría)"
+                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
+                      >
+                        <span className="material-symbols-rounded text-base">arrow_downward</span>
+                      </button>
+                      <button
+                        onClick={() => deleteProduct(p)}
+                        title="Eliminar para siempre"
+                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <span className="material-symbols-rounded text-base">delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
