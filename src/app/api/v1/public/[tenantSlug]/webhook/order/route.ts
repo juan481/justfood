@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ten
   }
 
   const idempotencyKey = req.headers.get('idempotency-key');
-  if (!idempotencyKey) {
+  if (!idempotencyKey || idempotencyKey.length > 128) {
     return NextResponse.json({ ok: false, error: 'Header Idempotency-Key requerido' }, { status: 400 });
   }
 
