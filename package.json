@@ -20,6 +20,7 @@
     "set:payment-config": "tsx scripts/set-payment-config.ts",
     "set:delivery-zones": "tsx scripts/set-delivery-zones.ts",
     "set:pizzazeka-menu": "tsx scripts/set-pizzazeka-menu.ts",
+    "create:staff-user": "tsx scripts/create-staff-user.ts",
     "seed:demo": "tsx scripts/seed-demo-data.ts"
   },
   "dependencies": {
