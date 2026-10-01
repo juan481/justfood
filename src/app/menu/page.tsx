@@ -22,12 +22,16 @@ interface Product {
   category: Category | null;
   sortOrder: number;
 }
+interface Section {
+  id: string;
+  name: string;
+  products: Product[];
+}
 
 export default function MenuPage() {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string | 'all'>('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
@@ -156,17 +160,18 @@ export default function MenuPage() {
     }
   }
 
-  // Mueve el producto un lugar arriba/abajo dentro de la vista filtrada
-  // actual (misma categoría/búsqueda que se está mirando) y renumera el
-  // orden de todo ese grupo — la mayoría de los productos comparten
-  // sortOrder=0 por default, así que "intercambiar" el valor entre dos que
-  // ya son iguales no movería nada; esto lo deja explícito y estable.
-  async function moveProduct(product: Product, direction: -1 | 1) {
-    const idx = filtered.findIndex((p) => p.id === product.id);
+  // Mueve el producto un lugar arriba/abajo DENTRO DE SU PROPIA CATEGORÍA
+  // (cada sección de la pantalla es una categoría, así que "la lista" acá es
+  // siempre la de esa sección) y renumera el orden de todo ese grupo — la
+  // mayoría de los productos comparten sortOrder=0 por default, así que
+  // "intercambiar" el valor entre dos que ya son iguales no movería nada;
+  // esto lo deja explícito y estable.
+  async function moveProduct(product: Product, direction: -1 | 1, sectionProducts: Product[]) {
+    const idx = sectionProducts.findIndex((p) => p.id === product.id);
     const swapIdx = idx + direction;
-    if (idx === -1 || swapIdx < 0 || swapIdx >= filtered.length) return;
+    if (idx === -1 || swapIdx < 0 || swapIdx >= sectionProducts.length) return;
 
-    const reordered = filtered.slice();
+    const reordered = sectionProducts.slice();
     const [moved] = reordered.splice(idx, 1);
     reordered.splice(swapIdx, 0, moved);
 
@@ -217,15 +222,32 @@ export default function MenuPage() {
     }
   }
 
-  const filtered = useMemo(() => {
-    return products
-      .filter((p) => {
-        if (categoryFilter !== 'all' && p.categoryId !== categoryFilter) return false;
-        if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
-        return true;
-      })
-      .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
-  }, [products, categoryFilter, search]);
+  // Agrupado por categoría, igual que se ve en la web — así editar no es
+  // perderse en una lista plana de 60 productos. Mismo orden de categorías
+  // que usa pizzazeka.com.ar (alfabético — sortOrder de categoría no se usa
+  // hoy, siempre es 0 para todas).
+  const sections = useMemo((): Section[] => {
+    const bySearch = search ? products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())) : products;
+    const byCategoryId = new Map<string, Product[]>();
+    bySearch.forEach((p) => {
+      const key = p.categoryId ?? '_none';
+      if (!byCategoryId.has(key)) byCategoryId.set(key, []);
+      byCategoryId.get(key)!.push(p);
+    });
+    byCategoryId.forEach((list) => list.sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name)));
+
+    const sortedCategories = categories.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const result: Section[] = [];
+    sortedCategories.forEach((c) => {
+      const list = byCategoryId.get(c.id);
+      if (list && list.length) result.push({ id: c.id, name: c.name, products: list });
+    });
+    const noCategory = byCategoryId.get('_none');
+    if (noCategory && noCategory.length) result.push({ id: '_none', name: 'Sin categoría', products: noCategory });
+    return result;
+  }, [products, categories, search]);
+
+  const totalCount = useMemo(() => sections.reduce((sum, s) => sum + s.products.length, 0), [sections]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -237,7 +259,7 @@ export default function MenuPage() {
           tips={[
             { icon: 'bolt', title: 'Cambiar precio en 1 clic', body: 'Escribí el nuevo valor directo en el recuadro y presioná Enter o el botón verde. Impacta en vivo.' },
             { icon: 'visibility_off', title: 'Pausar por falta de stock', body: 'Hacé clic en la cápsula En Carta para ocultarlo del cotizador al instante sin borrarlo.' },
-            { icon: 'swap_vert', title: 'Reordenar el menú', body: 'Filtrá por categoría arriba y usá las flechas de la columna "Orden" — ese orden es el que se ve en la web.' },
+            { icon: 'swap_vert', title: 'Reordenar el menú', body: 'Las flechas mueven el producto dentro de su propia categoría — ese orden es el que se ve en la web.' },
             { icon: 'delete', title: 'Eliminar para siempre', body: 'El tacho borra el producto por completo. Si solo le faltó stock, mejor pausalo — se puede reactivar.' },
             { icon: 'add_circle', title: 'Nueva variedad', body: 'Creá pizzas, bebidas o promos con el botón verde. Podés duplicar ingredientes y etiquetas al instante.' },
           ]}
@@ -297,186 +319,159 @@ export default function MenuPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
-          <button
-            onClick={() => setCategoryFilter('all')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all hover:scale-105 ${
-              categoryFilter === 'all' ? 'bg-command-800 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-command-300'
-            }`}
-          >
-            Todas
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setCategoryFilter(c.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap capitalize transition-all hover:scale-105 ${
-                categoryFilter === c.id ? 'bg-command-800 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-command-300'
-              }`}
-            >
-              {c.name}
-            </button>
-          ))}
-        </div>
+        {loading && <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 py-8 text-center text-slate-400 text-sm">Cargando...</div>}
+        {!loading && totalCount === 0 && <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-4 py-8 text-center text-slate-400 text-sm">Sin productos.</div>}
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
-              <tr>
-                <th className="text-left px-4 py-3 font-semibold">Producto</th>
-                <th className="text-left px-4 py-3 font-semibold hidden md:table-cell">Categoría</th>
-                <th className="text-right px-4 py-3 font-semibold">Precio</th>
-                <th className="text-center px-4 py-3 font-semibold">Tipo</th>
-                <th className="text-center px-4 py-3 font-semibold">Estado</th>
-                <th className="text-center px-4 py-3 font-semibold">Orden</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {loading && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                    Cargando...
-                  </td>
-                </tr>
-              )}
-              {!loading && filtered.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                    Sin productos.
-                  </td>
-                </tr>
-              )}
-              {filtered.map((p) => (
-                <tr key={p.id} className={`hover:bg-slate-50 transition-colors ${!p.isActive ? 'opacity-50' : ''}`}>
-                  <td className="px-4 py-3">
-                    {editingDetailsId === p.id ? (
-                      <div className="space-y-1.5 max-w-sm">
-                        <input
-                          autoFocus
-                          className="w-full px-2 py-1 border border-command-800 rounded-lg font-medium text-slate-800"
-                          value={nameDraft}
-                          onChange={(e) => setNameDraft(e.target.value)}
-                          placeholder="Nombre"
-                        />
-                        <input
-                          className="w-full px-2 py-1 border border-slate-200 rounded-lg text-xs text-slate-500"
-                          value={descriptionDraft}
-                          onChange={(e) => setDescriptionDraft(e.target.value)}
-                          placeholder="Descripción / ingredientes"
-                          onKeyDown={(e) => e.key === 'Enter' && saveDetails(p)}
-                        />
-                        <div className="flex gap-1.5">
+        {!loading &&
+          sections.map((section) => (
+            <div key={section.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="px-4 py-2.5 bg-command-800/[.07] text-command-900 text-xs font-bold uppercase tracking-wider capitalize">
+                {section.name} <span className="font-normal text-command-800/60 normal-case">({section.products.length})</span>
+              </div>
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-4 py-2.5 font-semibold">Producto</th>
+                    <th className="text-left px-4 py-2.5 font-semibold hidden md:table-cell">Categoría</th>
+                    <th className="text-right px-4 py-2.5 font-semibold">Precio</th>
+                    <th className="text-center px-4 py-2.5 font-semibold">Tipo</th>
+                    <th className="text-center px-4 py-2.5 font-semibold">Estado</th>
+                    <th className="text-center px-4 py-2.5 font-semibold">Orden</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {section.products.map((p) => (
+                    <tr key={p.id} className={`hover:bg-slate-50 transition-colors ${!p.isActive ? 'opacity-50' : ''}`}>
+                      <td className="px-4 py-3">
+                        {editingDetailsId === p.id ? (
+                          <div className="space-y-1.5 max-w-sm">
+                            <input
+                              autoFocus
+                              className="w-full px-2 py-1 border border-command-800 rounded-lg font-medium text-slate-800"
+                              value={nameDraft}
+                              onChange={(e) => setNameDraft(e.target.value)}
+                              placeholder="Nombre"
+                            />
+                            <input
+                              className="w-full px-2 py-1 border border-slate-200 rounded-lg text-xs text-slate-500"
+                              value={descriptionDraft}
+                              onChange={(e) => setDescriptionDraft(e.target.value)}
+                              placeholder="Descripción / ingredientes"
+                              onKeyDown={(e) => e.key === 'Enter' && saveDetails(p)}
+                            />
+                            <div className="flex gap-1.5">
+                              <button
+                                onClick={() => saveDetails(p)}
+                                disabled={savingDetails}
+                                className="px-2.5 py-1 rounded-lg bg-command-800 hover:bg-command-900 text-white text-[11px] font-semibold uppercase transition-colors disabled:opacity-50"
+                              >
+                                Guardar
+                              </button>
+                              <button
+                                onClick={() => setEditingDetailsId(null)}
+                                className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 text-[11px] font-semibold uppercase transition-colors"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button className="text-left group" onClick={() => startEditingDetails(p)}>
+                            <div className="font-medium text-slate-800 group-hover:text-command-800 group-hover:underline">{p.name}</div>
+                            {p.description && <div className="text-xs text-slate-400 line-clamp-1">{p.description}</div>}
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <select
+                          className="capitalize text-slate-600 bg-transparent border border-transparent hover:border-slate-200 rounded-lg px-1.5 py-1 -mx-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-command-800 focus:border-transparent"
+                          value={p.categoryId ?? ''}
+                          onChange={(e) => updateCategory(p, e.target.value)}
+                        >
+                          <option value="">Sin categoría</option>
+                          {categories.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono">
+                        {editingPriceId === p.id ? (
+                          <input
+                            autoFocus
+                            className="w-24 text-right px-2 py-1 border border-command-800 rounded-lg font-mono"
+                            value={priceDraft}
+                            onChange={(e) => setPriceDraft(e.target.value.replace(/\D/g, ''))}
+                            onBlur={() => savePrice(p)}
+                            onKeyDown={(e) => e.key === 'Enter' && savePrice(p)}
+                          />
+                        ) : (
                           <button
-                            onClick={() => saveDetails(p)}
-                            disabled={savingDetails}
-                            className="px-2.5 py-1 rounded-lg bg-command-800 hover:bg-command-900 text-white text-[11px] font-semibold uppercase transition-colors disabled:opacity-50"
+                            className="hover:text-command-800 hover:underline"
+                            onClick={() => {
+                              setEditingPriceId(p.id);
+                              setPriceDraft(String(p.price));
+                            }}
                           >
-                            Guardar
+                            {formatPesos(p.price)}
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => toggleFrozen(p)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 ${
+                            p.isFrozen ? 'bg-sky-100 text-sky-700 hover:bg-sky-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                          }`}
+                          title="Clic para cambiar — afecta el radio de envío"
+                        >
+                          {p.isFrozen ? '❄️ Congelado' : 'Estándar'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => toggleStock(p)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 ${
+                            p.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                          }`}
+                        >
+                          {p.isActive ? 'En Carta' : 'Pausado'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-0.5">
+                          <button
+                            onClick={() => moveProduct(p, -1, section.products)}
+                            disabled={section.products.findIndex((x) => x.id === p.id) === 0}
+                            title="Subir dentro de esta categoría"
+                            className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
+                          >
+                            <span className="material-symbols-rounded text-base">arrow_upward</span>
                           </button>
                           <button
-                            onClick={() => setEditingDetailsId(null)}
-                            className="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 text-[11px] font-semibold uppercase transition-colors"
+                            onClick={() => moveProduct(p, 1, section.products)}
+                            disabled={section.products.findIndex((x) => x.id === p.id) === section.products.length - 1}
+                            title="Bajar dentro de esta categoría"
+                            className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
                           >
-                            Cancelar
+                            <span className="material-symbols-rounded text-base">arrow_downward</span>
+                          </button>
+                          <button
+                            onClick={() => deleteProduct(p)}
+                            title="Eliminar para siempre"
+                            className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                          >
+                            <span className="material-symbols-rounded text-base">delete</span>
                           </button>
                         </div>
-                      </div>
-                    ) : (
-                      <button className="text-left group" onClick={() => startEditingDetails(p)}>
-                        <div className="font-medium text-slate-800 group-hover:text-command-800 group-hover:underline">{p.name}</div>
-                        {p.description && <div className="text-xs text-slate-400 line-clamp-1">{p.description}</div>}
-                      </button>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <select
-                      className="capitalize text-slate-600 bg-transparent border border-transparent hover:border-slate-200 rounded-lg px-1.5 py-1 -mx-1.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-command-800 focus:border-transparent"
-                      value={p.categoryId ?? ''}
-                      onChange={(e) => updateCategory(p, e.target.value)}
-                    >
-                      <option value="">Sin categoría</option>
-                      {categories.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono">
-                    {editingPriceId === p.id ? (
-                      <input
-                        autoFocus
-                        className="w-24 text-right px-2 py-1 border border-command-800 rounded-lg font-mono"
-                        value={priceDraft}
-                        onChange={(e) => setPriceDraft(e.target.value.replace(/\D/g, ''))}
-                        onBlur={() => savePrice(p)}
-                        onKeyDown={(e) => e.key === 'Enter' && savePrice(p)}
-                      />
-                    ) : (
-                      <button
-                        className="hover:text-command-800 hover:underline"
-                        onClick={() => {
-                          setEditingPriceId(p.id);
-                          setPriceDraft(String(p.price));
-                        }}
-                      >
-                        {formatPesos(p.price)}
-                      </button>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => toggleFrozen(p)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 ${
-                        p.isFrozen ? 'bg-sky-100 text-sky-700 hover:bg-sky-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                      title="Clic para cambiar — afecta el radio de envío"
-                    >
-                      {p.isFrozen ? '❄️ Congelado' : 'Estándar'}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => toggleStock(p)}
-                      className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all hover:scale-105 ${
-                        p.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                    >
-                      {p.isActive ? 'En Carta' : 'Pausado'}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-center gap-0.5">
-                      <button
-                        onClick={() => moveProduct(p, -1)}
-                        disabled={filtered.findIndex((x) => x.id === p.id) === 0}
-                        title="Subir (dentro de esta vista/categoría)"
-                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
-                      >
-                        <span className="material-symbols-rounded text-base">arrow_upward</span>
-                      </button>
-                      <button
-                        onClick={() => moveProduct(p, 1)}
-                        disabled={filtered.findIndex((x) => x.id === p.id) === filtered.length - 1}
-                        title="Bajar (dentro de esta vista/categoría)"
-                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-command-800 disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
-                      >
-                        <span className="material-symbols-rounded text-base">arrow_downward</span>
-                      </button>
-                      <button
-                        onClick={() => deleteProduct(p)}
-                        title="Eliminar para siempre"
-                        className="w-6 h-6 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <span className="material-symbols-rounded text-base">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
       </main>
       <Footer />
 
