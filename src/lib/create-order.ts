@@ -25,6 +25,9 @@ export interface CreateOrderInput {
   paymentMethod?: string;
   paymentStatus?: string;
   deliveryFee?: number;
+  // Quote displayed to the customer immediately before checkout. It is never
+  // used as the actual total: it only lets us reject a stale menu price.
+  expectedTotal?: number;
   idempotencyKey?: string;
   createdByUserId?: string;
 }
@@ -32,6 +35,12 @@ export interface CreateOrderInput {
 export class DuplicateOrderError extends Error {
   constructor(public readonly existingOrderId: string) {
     super('Ya existe un pedido con esa idempotency key.');
+  }
+}
+
+export class OrderPriceChangedError extends Error {
+  constructor(public readonly currentTotal: number) {
+    super('El precio del pedido cambió. Actualizá el carrito antes de confirmar.');
   }
 }
 
@@ -46,6 +55,12 @@ export async function createOrder(input: CreateOrderInput) {
   const { items, subtotal } = await priceCart(input.tenantId, input.items);
   const deliveryFee = Math.max(0, Math.round(input.deliveryFee ?? 0));
   const totalAmount = subtotal + deliveryFee;
+
+  if (input.expectedTotal !== undefined) {
+    if (!Number.isSafeInteger(input.expectedTotal) || input.expectedTotal < 0 || input.expectedTotal !== totalAmount) {
+      throw new OrderPriceChangedError(totalAmount);
+    }
+  }
 
   const initialStatus = GATED_PAYMENT_METHODS.has(input.paymentMethod ?? 'efectivo')
     ? OrderStatus.EN_ESPERA_PAGO

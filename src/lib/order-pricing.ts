@@ -23,7 +23,7 @@ export interface PricedItem {
 export class OrderPricingError extends Error {
   constructor(
     message: string,
-    public readonly code: 'PRODUCT_NOT_FOUND' | 'PRODUCT_UNAVAILABLE' | 'EMPTY_CART',
+    public readonly code: 'PRODUCT_NOT_FOUND' | 'PRODUCT_UNAVAILABLE' | 'EMPTY_CART' | 'INVALID_QUANTITY',
     public readonly productId?: string
   ) {
     super(message);
@@ -45,6 +45,9 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
   let subtotal = 0;
 
   for (const item of items) {
+    if (typeof item.productId !== 'string' || !item.productId) {
+      throw new OrderPricingError('Producto inválido.', 'PRODUCT_NOT_FOUND');
+    }
     const product = productById.get(item.productId);
     if (!product) {
       throw new OrderPricingError(`Producto no encontrado: ${item.productId}`, 'PRODUCT_NOT_FOUND', item.productId);
@@ -52,7 +55,13 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
     if (!product.isActive) {
       throw new OrderPricingError(`"${product.name}" ya no está disponible.`, 'PRODUCT_UNAVAILABLE', item.productId);
     }
-    const quantity = Math.max(1, Math.floor(item.quantity));
+    // This endpoint is public: TypeScript types do not validate hostile JSON.
+    // Bound quantities to a realistic order size so Infinity/NaN or an abusive
+    // payload cannot turn into a database error or an accidental huge order.
+    const quantity = Number(item.quantity);
+    if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100) {
+      throw new OrderPricingError('Cantidad inválida (debe ser un entero entre 1 y 100).', 'INVALID_QUANTITY', item.productId);
+    }
     pricedItems.push({
       productId: product.id,
       productNameSnapshot: product.name,
