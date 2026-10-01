@@ -34,6 +34,7 @@ export default function MenuPage() {
   const [editingDetailsId, setEditingDetailsId] = useState<string | null>(null);
   const [nameDraft, setNameDraft] = useState('');
   const [descriptionDraft, setDescriptionDraft] = useState('');
+  const [categoryDraft, setCategoryDraft] = useState('');
   const [savingDetails, setSavingDetails] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showNewProduct, setShowNewProduct] = useState(false);
@@ -87,6 +88,7 @@ export default function MenuPage() {
     setEditingDetailsId(product.id);
     setNameDraft(product.name);
     setDescriptionDraft(product.description ?? '');
+    setCategoryDraft(product.categoryId ?? '');
   }
 
   async function saveDetails(product: Product) {
@@ -99,7 +101,7 @@ export default function MenuPage() {
     const res = await fetch(`/api/v1/admin/products/${product.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, description: descriptionDraft.trim() || null }),
+      body: JSON.stringify({ name, description: descriptionDraft.trim() || null, categoryId: categoryDraft || null }),
     });
     const data = await res.json();
     setSavingDetails(false);
@@ -302,6 +304,18 @@ export default function MenuPage() {
                           placeholder="Descripción / ingredientes"
                           onKeyDown={(e) => e.key === 'Enter' && saveDetails(p)}
                         />
+                        <select
+                          className="w-full px-2 py-1 border border-slate-200 rounded-lg text-xs text-slate-600 capitalize"
+                          value={categoryDraft}
+                          onChange={(e) => setCategoryDraft(e.target.value)}
+                        >
+                          <option value="">Sin categoría</option>
+                          {categories.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
                         <div className="flex gap-1.5">
                           <button
                             onClick={() => saveDetails(p)}
