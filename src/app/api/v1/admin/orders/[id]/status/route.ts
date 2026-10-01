@@ -13,7 +13,12 @@ import { OrderStatus } from '@prisma/client';
 // states (ENTREGADO/CANCELADO) still can't be walked back from here; use
 // Historial/refund flows for those instead of a status flip.
 const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  EN_ESPERA_PAGO: [OrderStatus.NUEVO, OrderStatus.CANCELADO],
+  // EN_ESPERA_PAGO -> NUEVO/ENTREGADO solo puede pasar por
+  // releaseOrderToKitchen() (aprobar un comprobante en /pagos) — ese es el
+  // único lugar que loguea la aprobación real y, para una mesa de Salón,
+  // es quien la libera a verde. Este endpoint genérico nunca debe poder
+  // saltear esa revisión.
+  EN_ESPERA_PAGO: [OrderStatus.CANCELADO],
   NUEVO: [OrderStatus.COCINA, OrderStatus.CANCELADO],
   COCINA: [OrderStatus.REPARTO, OrderStatus.NUEVO, OrderStatus.CANCELADO],
   REPARTO: [OrderStatus.ENTREGADO, OrderStatus.COCINA, OrderStatus.CANCELADO],

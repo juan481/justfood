@@ -14,6 +14,10 @@ export function getIO(): SocketIOServer | undefined {
   return g.__justfoodIO;
 }
 
-export function emitOrderEvent(tenantId: string, event: 'order:new' | 'order:status-changed', payload: unknown) {
+export function emitOrderEvent(
+  tenantId: string,
+  event: 'order:new' | 'order:status-changed' | 'table:state-changed',
+  payload: unknown
+) {
   getIO()?.to(`tenant:${tenantId}:kds`).emit(event, payload);
 }

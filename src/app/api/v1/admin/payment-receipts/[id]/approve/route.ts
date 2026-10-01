@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireSession, hasRole } from '@/lib/admin-session';
 import { releaseOrderToKitchen } from '@/lib/release-order';
+import { OrderChannel, OrderStatus } from '@prisma/client';
 
 // The one human checkpoint in the whole WhatsApp payment flow (plan section
 // 6.4/6.1): approving here is what promotes EN_ESPERA_PAGO -> NUEVO and
@@ -15,7 +16,10 @@ export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ ok: false, error: 'Rol insuficiente' }, { status: 403 });
   }
 
-  const receipt = await prisma.paymentReceipt.findFirst({ where: { id, tenantId: session.user.tenantId } });
+  const receipt = await prisma.paymentReceipt.findFirst({
+    where: { id, tenantId: session.user.tenantId },
+    include: { order: { select: { channel: true } } },
+  });
   if (!receipt) return NextResponse.json({ ok: false, error: 'Comprobante no encontrado' }, { status: 404 });
   if (receipt.finalStatus !== 'PENDING') {
     return NextResponse.json({ ok: false, error: 'Este comprobante ya fue revisado' }, { status: 409 });
@@ -26,7 +30,10 @@ export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ i
     data: { finalStatus: 'APPROVED', reviewedByUserId: session.user.id, reviewedAt: new Date() },
   });
 
-  const order = await releaseOrderToKitchen(receipt.orderId, session.user.tenantId, 'pagado', session.user.id);
+  // Una mesa de Salón (Fase 2) ya se consumió y se cerró — aprobar el
+  // comprobante la manda a ENTREGADO, no "a cocina" de nuevo.
+  const targetStatus = receipt.order.channel === OrderChannel.DINE_IN ? OrderStatus.ENTREGADO : OrderStatus.NUEVO;
+  const order = await releaseOrderToKitchen(receipt.orderId, session.user.tenantId, 'pagado', session.user.id, targetStatus);
 
   return NextResponse.json({ ok: true, order });
 }

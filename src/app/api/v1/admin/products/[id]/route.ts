@@ -30,6 +30,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       isActive: typeof body.isActive === 'boolean' ? body.isActive : undefined,
       isFrozen: typeof body.isFrozen === 'boolean' ? body.isFrozen : undefined,
       sortOrder: typeof body.sortOrder === 'number' ? body.sortOrder : undefined,
+      // null = hereda la estación de la categoría — también necesita el
+      // chequeo `=== undefined` para poder volver a "Heredar" explícitamente.
+      prepAreaOverride: body.prepAreaOverride === undefined ? undefined : body.prepAreaOverride,
     },
     // The admin UI merges this response straight into its product list —
     // without `category` the nested object would be dropped from local

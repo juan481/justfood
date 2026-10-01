@@ -1,17 +1,22 @@
 import { prisma } from '@/lib/prisma';
 import { emitOrderEvent } from '@/lib/socket';
 import { dispatchOrderToFudo } from '@/lib/fudo';
-import { OrderStatus } from '@prisma/client';
+import { OrderChannel, OrderStatus } from '@prisma/client';
 
-// Shared by two callers that both promote an order out of EN_ESPERA_PAGO:
-// a human approving a comprobante in "Pagos por Revisar" (Fase 2d), and the
-// Mercado Pago webhook confirming a digital payment (Fase 4) — same
-// real-time path either way, same Fudo dispatch trigger point.
+// Shared by callers that all promote an order out of EN_ESPERA_PAGO: a human
+// approving a comprobante in "Pagos por Revisar" (Fase 2d), the Mercado Pago
+// webhook confirming a digital payment (Fase 4), and now a Salón table closed
+// with MP/transferencia (Fase 2 Salón) — same real-time path either way.
 export async function releaseOrderToKitchen(
   orderId: string,
   tenantId: string,
   paymentStatus: string,
-  changedByUserId?: string
+  changedByUserId?: string,
+  // Una mesa de Salón ya se consumió y se cerró — aprobar su comprobante no
+  // tiene que mandarla "a cocina" de nuevo, va directo a ENTREGADO. Los
+  // llamadores existentes (comprobante de WhatsApp) no pasan esto y siguen
+  // yendo a NUEVO como siempre.
+  targetStatus: OrderStatus = OrderStatus.NUEVO
 ) {
   // Both current callers already resolve orderId through a tenant-scoped
   // lookup before calling this, but `update` can't filter by tenantId
@@ -23,7 +28,7 @@ export async function releaseOrderToKitchen(
 
   const order = await prisma.order.update({
     where: { id: orderId },
-    data: { status: OrderStatus.NUEVO, paymentStatus, version: { increment: 1 } },
+    data: { status: targetStatus, paymentStatus, version: { increment: 1 } },
     include: { items: true },
   });
 
@@ -31,16 +36,32 @@ export async function releaseOrderToKitchen(
     data: {
       orderId,
       fromStatus: OrderStatus.EN_ESPERA_PAGO,
-      toStatus: OrderStatus.NUEVO,
+      toStatus: targetStatus,
       changedByUserId: changedByUserId ?? null,
     },
   });
 
+  // Una mesa de Salón cerrada con MP/transferencia se queda en azul
+  // (ESPERANDO_PAGO) hasta este momento — recién acá, con el comprobante ya
+  // aprobado, se libera a verde. Ver table-session.ts closeTable().
+  if (owned.tableId) {
+    await prisma.table.updateMany({
+      where: { id: owned.tableId, currentOrderId: orderId },
+      data: { currentOrderId: null, status: 'LIBRE' },
+    });
+    emitOrderEvent(tenantId, 'table:state-changed', { id: owned.tableId, status: 'LIBRE', currentOrderId: null });
+  }
+
   emitOrderEvent(tenantId, 'order:new', order);
-  dispatchOrderToFudo(order).catch(() => {
-    // dispatchOrderToFudo already logs its own errors — never let a POS
-    // sync hiccup block the order from reaching the kitchen.
-  });
+
+  // Todo este módulo de Salón existe para reemplazar Fudo en las mesas —
+  // nunca tiene sentido sincronizar un pedido de mesa hacia él.
+  if (order.channel !== OrderChannel.DINE_IN) {
+    dispatchOrderToFudo(order).catch(() => {
+      // dispatchOrderToFudo already logs its own errors — never let a POS
+      // sync hiccup block the order from reaching the kitchen.
+    });
+  }
 
   return order;
 }

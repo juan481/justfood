@@ -1,5 +1,6 @@
 export type OrderStatus = 'EN_ESPERA_PAGO' | 'NUEVO' | 'COCINA' | 'REPARTO' | 'ENTREGADO' | 'CANCELADO';
-export type OrderChannel = 'WEB' | 'MOSTRADOR' | 'WHATSAPP';
+export type OrderChannel = 'WEB' | 'MOSTRADOR' | 'WHATSAPP' | 'DINE_IN';
+export type PrepArea = 'COCINA' | 'BARRA' | 'SIN_IMPRESION';
 
 export interface OrderItem {
   id: string;
@@ -8,6 +9,9 @@ export interface OrderItem {
   unitPriceSnapshot: number;
   quantity: number;
   notes: string | null;
+  createdAt: string;
+  prepAreaSnapshot: PrepArea | null;
+  preparedAt: string | null;
 }
 
 export interface Order {
@@ -31,4 +35,10 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  // Fase 2 (Salón) — solo tiene valor con channel=DINE_IN.
+  tableId: string | null;
+  guestCount: number | null;
+  waiterUserId: string | null;
+  waiterName: string | null;
+  table?: { number: number } | null;
 }

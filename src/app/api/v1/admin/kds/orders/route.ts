@@ -23,6 +23,11 @@ export async function GET() {
   const orders = await prisma.order.findMany({
     where: {
       tenantId: session.user.tenantId,
+      // Fase 2 (Salón): un pedido de mesa vive abierto en status NUEVO
+      // mientras dura todo el consumo (potencialmente horas) — sin este
+      // filtro, el Comandero se llenaría de tarjetas de mesas abiertas que
+      // no tienen nada que ver con el flujo de delivery/mostrador/whatsapp.
+      channel: { not: 'DINE_IN' },
       OR: [
         { status: { in: [OrderStatus.NUEVO, OrderStatus.COCINA, OrderStatus.REPARTO] } },
         { status: OrderStatus.ENTREGADO, updatedAt: { gte: startOfToday } },

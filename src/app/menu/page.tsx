@@ -7,10 +7,14 @@ import { Footer } from '@/components/Footer';
 import { GuideCard } from '@/components/GuideCard';
 import { formatPesos } from '@/lib/format';
 
+type PrepArea = 'COCINA' | 'BARRA' | 'SIN_IMPRESION';
 interface Category {
   id: string;
   name: string;
+  prepArea: PrepArea;
 }
+
+const PREP_AREA_LABEL: Record<PrepArea, string> = { COCINA: '🔥 Cocina', BARRA: '🍹 Barra', SIN_IMPRESION: '❄️ Sin impresión' };
 interface Product {
   id: string;
   name: string;
@@ -150,6 +154,19 @@ export default function MenuPage() {
     }
   }
 
+  async function updateCategoryPrepArea(categoryId: string, prepArea: PrepArea) {
+    const res = await fetch(`/api/v1/admin/categories/${categoryId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prepArea }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      setCategories((prev) => prev.map((c) => (c.id === categoryId ? { ...c, prepArea } : c)));
+      showToast(`Estación de preparación actualizada`);
+    }
+  }
+
   async function deleteProduct(product: Product) {
     if (!window.confirm(`¿Eliminar "${product.name}" para siempre? Esto no se puede deshacer — si solo querés ocultarlo de la carta, usá "Pausado" en vez de esto.`)) return;
     const res = await fetch(`/api/v1/admin/products/${product.id}`, { method: 'DELETE' });
@@ -262,6 +279,7 @@ export default function MenuPage() {
             { icon: 'swap_vert', title: 'Reordenar el menú', body: 'Las flechas mueven el producto dentro de su propia categoría — ese orden es el que se ve en la web.' },
             { icon: 'delete', title: 'Eliminar para siempre', body: 'El tacho borra el producto por completo. Si solo le faltó stock, mejor pausalo — se puede reactivar.' },
             { icon: 'add_circle', title: 'Nueva variedad', body: 'Creá pizzas, bebidas o promos con el botón verde. Podés duplicar ingredientes y etiquetas al instante.' },
+            { icon: 'print', title: 'Estación de impresión', body: 'En el encabezado de cada categoría elegís si imprime en Cocina, Barra, o nada (bebidas de heladera) — define a qué pantalla va cada pedido de mesa.' },
           ]}
         />
 
@@ -325,8 +343,26 @@ export default function MenuPage() {
         {!loading &&
           sections.map((section) => (
             <div key={section.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-4 py-2.5 bg-command-800/[.07] text-command-900 text-xs font-bold uppercase tracking-wider capitalize">
-                {section.name} <span className="font-normal text-command-800/60 normal-case">({section.products.length})</span>
+              <div className="px-4 py-2.5 bg-command-800/[.07] text-command-900 text-xs font-bold uppercase tracking-wider capitalize flex items-center justify-between gap-2 flex-wrap">
+                <span>
+                  {section.name} <span className="font-normal text-command-800/60 normal-case">({section.products.length})</span>
+                </span>
+                {section.id !== '_none' && (
+                  <label className="normal-case font-normal flex items-center gap-1.5 text-[11px] text-command-800/70">
+                    Estación de impresión
+                    <select
+                      className="bg-white border border-command-800/20 rounded-lg px-1.5 py-0.5 text-xs text-command-900 cursor-pointer focus:outline-none focus:ring-2 focus:ring-command-800"
+                      value={categories.find((c) => c.id === section.id)?.prepArea ?? 'COCINA'}
+                      onChange={(e) => updateCategoryPrepArea(section.id, e.target.value as PrepArea)}
+                    >
+                      {(Object.keys(PREP_AREA_LABEL) as PrepArea[]).map((pa) => (
+                        <option key={pa} value={pa}>
+                          {PREP_AREA_LABEL[pa]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
               </div>
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">

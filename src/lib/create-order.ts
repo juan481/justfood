@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { emitOrderEvent } from '@/lib/socket';
 import { priceCart, type CartItemInput } from '@/lib/order-pricing';
 import { dispatchOrderToFudo } from '@/lib/fudo';
-import { OrderChannel, OrderStatus } from '@prisma/client';
+import { OrderChannel, OrderStatus, Prisma } from '@prisma/client';
 
 // Payment methods that need external confirmation before a kitchen ever
 // sees the order: a bank transfer needs a human to check the comprobante
@@ -45,6 +45,21 @@ export class OrderPriceChangedError extends Error {
   constructor(public readonly currentTotal: number) {
     super('El precio del pedido cambió. Actualizá el carrito antes de confirmar.');
   }
+}
+
+// `orderSeq` increment es un UPDATE con row-lock — dos pedidos creados en el
+// mismo instante (web + mostrador + WhatsApp + ahora Salón pueden disparar a
+// la vez) igual serializan sobre esta fila y sacan códigos distintos, a
+// diferencia de un COUNT(*) separado que ambos podrían leer igual. Exportado
+// para que table-session.ts (Fase 2 — abre una mesa con un Order vacío, sin
+// pasar por createOrder()/priceCart() porque el carrito arranca en cero) use
+// el mismo código de pedido consistente en vez de inventar uno propio.
+export async function nextOrderCode(tx: Prisma.TransactionClient, tenantId: string): Promise<string> {
+  const tenant = await tx.tenant.update({
+    where: { id: tenantId },
+    data: { orderSeq: { increment: 1 } },
+  });
+  return `JF-${String(tenant.orderSeq).padStart(5, '0')}`;
 }
 
 // Picks the delivery cost for a web/WhatsApp order from the cart's product
@@ -105,15 +120,7 @@ export async function createOrder(input: CreateOrderInput) {
     : OrderStatus.NUEVO;
 
   const order = await prisma.$transaction(async (tx) => {
-    // `orderSeq` increment is a single row-locked UPDATE — two orders
-    // created in the same instant (web + mostrador + WhatsApp can all fire
-    // concurrently) still serialize on this row and get distinct codes,
-    // unlike a separate COUNT(*) read which both could see identically.
-    const tenant = await tx.tenant.update({
-      where: { id: input.tenantId },
-      data: { orderSeq: { increment: 1 } },
-    });
-    const orderCode = `JF-${String(tenant.orderSeq).padStart(5, '0')}`;
+    const orderCode = await nextOrderCode(tx, input.tenantId);
 
     const created = await tx.order.create({
       data: {

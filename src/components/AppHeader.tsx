@@ -7,7 +7,7 @@ import { signOut } from 'next-auth/react';
 
 interface AppHeaderProps {
   tenantName: string;
-  activeNav: 'home' | 'kds' | 'menu' | 'pagos' | 'analitica' | 'salon' | 'qr' | 'caja' | 'historial' | 'ajustes' | 'cadetes';
+  activeNav: 'home' | 'kds' | 'barra' | 'menu' | 'pagos' | 'analitica' | 'salon' | 'qr' | 'caja' | 'historial' | 'ajustes' | 'cadetes';
   soundEnabled?: boolean;
   onToggleSound?: () => void;
   live?: boolean;
@@ -16,6 +16,7 @@ interface AppHeaderProps {
 const NAV_ITEMS: { key: AppHeaderProps['activeNav']; label: string; icon: string; href: string | null }[] = [
   { key: 'home', label: 'Inicio', icon: 'home', href: '/panel' },
   { key: 'kds', label: 'Comandero & Cocina', icon: 'receipt_long', href: '/kds' },
+  { key: 'barra', label: 'Barra', icon: 'local_bar', href: '/barra' },
   { key: 'cadetes', label: 'Cadetes & Repartidores', icon: 'moped', href: '/cadetes' },
   { key: 'menu', label: 'Menú & Stock', icon: 'menu_book', href: '/menu' },
   { key: 'pagos', label: 'Pagos por Revisar', icon: 'fact_check', href: '/pagos' },

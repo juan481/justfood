@@ -14,7 +14,7 @@ const PREV_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   REPARTO: 'COCINA',
   ENTREGADO: 'REPARTO',
 };
-const CHANNEL_LABEL: Record<Order['channel'], string> = { WEB: 'Web', MOSTRADOR: 'Mostrador', WHATSAPP: 'WhatsApp' };
+const CHANNEL_LABEL: Record<Order['channel'], string> = { WEB: 'Web', MOSTRADOR: 'Mostrador', WHATSAPP: 'WhatsApp', DINE_IN: 'Salón' };
 const DELIVERY_LABEL: Record<string, string> = { delivery: 'Delivery', mostrador: 'Retiro', salon: 'Mesa/Salón' };
 
 interface CourierOption {

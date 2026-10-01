@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { PrepArea } from '@prisma/client';
 
 // Recomputes an order's total server-side from current catalog prices —
 // this is the direct fix for the PizzaZeka prototype's trust bug (it
@@ -22,6 +23,10 @@ export interface PricedItem {
   unitPriceSnapshot: number;
   quantity: number;
   notes: string | null;
+  // A dónde se imprime/rutea este ítem (Fase 2 Salón) — congelado al
+  // momento del pedido, igual criterio que el resto de los *Snapshot:
+  // editar la categoría después nunca reescribe un ticket ya impreso.
+  prepAreaSnapshot: PrepArea;
 }
 
 export class OrderPricingError extends Error {
@@ -42,6 +47,7 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
   const productIds = items.flatMap((i) => [i.productId, ...(i.halfProductId ? [i.halfProductId] : [])]);
   const products = await prisma.product.findMany({
     where: { tenantId, id: { in: productIds } },
+    include: { category: true },
   });
   const productById = new Map(products.map((p) => [p.id, p]));
 
@@ -89,6 +95,7 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
       unitPriceSnapshot: unitPrice,
       quantity,
       notes: item.notes ?? null,
+      prepAreaSnapshot: product.prepAreaOverride ?? product.category?.prepArea ?? PrepArea.COCINA,
     });
     subtotal += unitPrice * quantity;
     if (product.isFrozen) hasFrozenItem = true;

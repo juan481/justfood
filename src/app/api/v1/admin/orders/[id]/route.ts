@@ -12,7 +12,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const order = await prisma.order.findFirst({
     where: { id, tenantId: session.user.tenantId },
-    include: { items: true },
+    // table: la comanda impresa de una mesa de Salón (Fase 2) muestra
+    // "Mesa {número}" en vez del bloque de cliente de delivery.
+    include: { items: true, table: { select: { number: true } } },
   });
   if (!order) return NextResponse.json({ ok: false, error: 'Pedido no encontrado' }, { status: 404 });
 

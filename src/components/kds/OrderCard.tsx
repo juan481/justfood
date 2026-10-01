@@ -9,6 +9,9 @@ const CHANNEL_META: Record<Order['channel'], { icon: string; label: string; clas
   WEB: { icon: 'public', label: 'Web', className: 'bg-blue-50 text-blue-700' },
   MOSTRADOR: { icon: 'storefront', label: 'Mostrador', className: 'bg-slate-100 text-slate-600' },
   WHATSAPP: { icon: 'chat', label: 'WhatsApp', className: 'bg-emerald-50 text-emerald-700' },
+  // El Comandero filtra los pedidos DINE_IN (Fase 2 Salón) desde la query —
+  // esta entrada es solo para que el Record siga siendo exhaustivo.
+  DINE_IN: { icon: 'table_restaurant', label: 'Salón', className: 'bg-amber-50 text-amber-700' },
 };
 
 const DELIVERY_META: Record<string, { icon: string; label: string; className: string }> = {
