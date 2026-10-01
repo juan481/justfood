@@ -30,6 +30,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'name y price son requeridos' }, { status: 400 });
   }
 
+  // El frontend legacy de Pizza Zeka (server.js) solo reenvía productos con
+  // legacyProductId numérico — es el puente de IDs que arrastra desde el
+  // prototipo original. Sin esto, cualquier producto creado desde acá queda
+  // invisible en pizzazeka.com.ar aunque esté activo. Autoasignamos el
+  // siguiente entero libre del tenant para que el puente siga funcionando
+  // sin tener que tocar el HTML/JS legacy.
+  const maxLegacy = await prisma.product.aggregate({
+    where: { tenantId: session.user.tenantId },
+    _max: { legacyProductId: true },
+  });
+  const nextLegacyProductId = (maxLegacy._max.legacyProductId ?? 0) + 1;
+
   const product = await prisma.product.create({
     data: {
       tenantId: session.user.tenantId,
@@ -39,6 +51,7 @@ export async function POST(req: NextRequest) {
       price: Math.round(body.price),
       isActive: body.isActive ?? true,
       isFrozen: body.isFrozen ?? false,
+      legacyProductId: nextLegacyProductId,
     },
   });
 
