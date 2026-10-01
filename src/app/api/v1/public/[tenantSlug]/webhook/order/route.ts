@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OrderChannel } from '@prisma/client';
 import { resolveTenant, resolveDefaultBranch } from '@/lib/tenant';
-import { prisma } from '@/lib/prisma';
 import { verifyTenantApiKey } from '@/lib/api-auth';
 import { createOrder, DuplicateOrderError, OrderPriceChangedError } from '@/lib/create-order';
 import { OrderPricingError } from '@/lib/order-pricing';
@@ -39,9 +38,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ten
   }
 
   try {
-    const deliveryZone = body.delivery_type === 'delivery'
-      ? await prisma.deliveryZone.findFirst({ where: { tenantId: tenant.id, branchId: branch.id, isActive: true } })
-      : null;
     const order = await createOrder({
       tenantId: tenant.id,
       branchId: branch.id,
@@ -54,7 +50,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ten
       notes: body.notes,
       deliveryType: body.delivery_type,
       paymentMethod: body.payment_method,
-      deliveryFee: deliveryZone?.cost ?? 0,
       expectedTotal: body.expected_total,
       idempotencyKey,
     });

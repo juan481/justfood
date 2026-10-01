@@ -24,6 +24,9 @@ export interface CreateOrderInput {
   deliveryType?: string;
   paymentMethod?: string;
   paymentStatus?: string;
+  // Mostrador/WhatsApp manual (Fase 2a) pass this explicitly — staff eyeballs
+  // the distance themselves. Web checkout omits it and lets resolveDeliveryFee
+  // below pick the right DeliveryZone from the cart's product mix.
   deliveryFee?: number;
   // Quote displayed to the customer immediately before checkout. It is never
   // used as the actual total: it only lets us reject a stale menu price.
@@ -44,6 +47,35 @@ export class OrderPriceChangedError extends Error {
   }
 }
 
+// Picks the delivery cost for a web/WhatsApp order from the cart's product
+// mix: a STANDARD item (not Product.isFrozen — pizzas, bebidas, etc.) needs
+// the tighter zone since it's what actually constrains how far the order can
+// travel; FROZEN-only carts use the wider zone. `ALL` is the fallback for any
+// tenant that never split its delivery zones by scope. Logs every branch so a
+// misconfigured tenant (no zone at all) shows up in the server log instead of
+// silently shipping a $0 delivery fee.
+async function resolveDeliveryFee(
+  tenantId: string,
+  branchId: string,
+  hasStandardItem: boolean,
+  hasFrozenItem: boolean
+): Promise<number> {
+  const zones = await prisma.deliveryZone.findMany({
+    where: { tenantId, branchId, isActive: true },
+  });
+  const zoneByScope = new Map(zones.map((z) => [z.scope, z]));
+  const pick = (scope: 'STANDARD' | 'FROZEN') => zoneByScope.get(scope) ?? zoneByScope.get('ALL') ?? null;
+
+  // A mixed cart (pizza + congelado) ships in a single delivery, so the
+  // tighter STANDARD zone governs the cost — the frozen item just rides along.
+  const zone = hasStandardItem ? pick('STANDARD') : hasFrozenItem ? pick('FROZEN') : null;
+  if (!zone) {
+    console.warn(`[delivery-zone] Tenant ${tenantId}/branch ${branchId} has no active DeliveryZone for this cart (standard=${hasStandardItem}, frozen=${hasFrozenItem}) — charging $0 delivery.`);
+    return 0;
+  }
+  return zone.cost;
+}
+
 export async function createOrder(input: CreateOrderInput) {
   if (input.idempotencyKey) {
     const existing = await prisma.order.findUnique({
@@ -52,8 +84,14 @@ export async function createOrder(input: CreateOrderInput) {
     if (existing) throw new DuplicateOrderError(existing.id);
   }
 
-  const { items, subtotal } = await priceCart(input.tenantId, input.items);
-  const deliveryFee = Math.max(0, Math.round(input.deliveryFee ?? 0));
+  const { items, subtotal, hasStandardItem, hasFrozenItem } = await priceCart(input.tenantId, input.items);
+  const isDelivery = (input.deliveryType ?? 'delivery') === 'delivery';
+  const resolvedDeliveryFee = input.deliveryFee !== undefined
+    ? input.deliveryFee
+    : isDelivery
+      ? await resolveDeliveryFee(input.tenantId, input.branchId, hasStandardItem, hasFrozenItem)
+      : 0;
+  const deliveryFee = Math.max(0, Math.round(resolvedDeliveryFee));
   const totalAmount = subtotal + deliveryFee;
 
   if (input.expectedTotal !== undefined) {

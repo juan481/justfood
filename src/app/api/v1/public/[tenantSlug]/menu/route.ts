@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveTenant } from '@/lib/tenant';
+import { getPublicDeliveryZones, flattenDeliveryZone } from '@/lib/delivery-zones';
 
 // Direct port of PizzaZeka's GET /api/menu — read endpoint, no API key
 // required (a public menu has to be publicly fetchable), short-cacheable.
@@ -11,11 +12,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ten
     return NextResponse.json({ ok: false, error: 'Tenant no encontrado' }, { status: 404 });
   }
 
-  const [categories, products, settings, deliveryZone, paymentConfig, branch] = await Promise.all([
+  const [categories, products, settings, deliveryZones, paymentConfig, branch] = await Promise.all([
     prisma.category.findMany({ where: { tenantId: tenant.id, isActive: true }, orderBy: { sortOrder: 'asc' } }),
     prisma.product.findMany({ where: { tenantId: tenant.id, isActive: true }, orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }] }),
     prisma.tenantSetting.findMany({ where: { tenantId: tenant.id } }),
-    prisma.deliveryZone.findFirst({ where: { tenantId: tenant.id, isActive: true } }),
+    getPublicDeliveryZones(tenant.id),
     prisma.paymentConfig.findUnique({ where: { tenantId: tenant.id } }),
     prisma.branch.findFirst({ where: { tenantId: tenant.id, isDefault: true } }),
   ]);
@@ -33,8 +34,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ten
       logo_url: tenant.logoUrl ?? null,
       address: branch?.address ?? null,
       business_hours: settingsMap.business_hours ? JSON.parse(settingsMap.business_hours) : null,
-      delivery_cost: deliveryZone?.cost ?? null,
-      delivery_radius_km: deliveryZone?.radiusKm ?? null,
+      // Per-scope zones (STANDARD vs FROZEN) — see delivery_zones usage in
+      // the Pizza Zeka frontend. delivery_cost/radius_km stay for backward
+      // compatibility with callers that only know about one flat zone.
+      delivery_zones: deliveryZones,
+      ...flattenDeliveryZone(deliveryZones),
       // El checkout de la web del cliente necesita esto para mostrarle el
       // alias/CVU al que transferir — sin esto, el cliente no tiene forma
       // de saber a dónde pagar.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveTenant } from '@/lib/tenant';
+import { getPublicDeliveryZones, flattenDeliveryZone } from '@/lib/delivery-zones';
 
 // Port of PizzaZeka's GET /api/config/public — same payload as /menu's
 // `config` block, kept as its own endpoint for callers that only need
@@ -12,9 +13,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ten
     return NextResponse.json({ ok: false, error: 'Tenant no encontrado' }, { status: 404 });
   }
 
-  const [settings, deliveryZone, paymentConfig, branch] = await Promise.all([
+  const [settings, deliveryZones, paymentConfig, branch] = await Promise.all([
     prisma.tenantSetting.findMany({ where: { tenantId: tenant.id } }),
-    prisma.deliveryZone.findFirst({ where: { tenantId: tenant.id, isActive: true } }),
+    getPublicDeliveryZones(tenant.id),
     prisma.paymentConfig.findUnique({ where: { tenantId: tenant.id } }),
     prisma.branch.findFirst({ where: { tenantId: tenant.id, isDefault: true } }),
   ]);
@@ -27,8 +28,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ten
     logo_url: tenant.logoUrl ?? null,
     address: branch?.address ?? null,
     business_hours: settingsMap.business_hours ? JSON.parse(settingsMap.business_hours) : null,
-    delivery_cost: deliveryZone?.cost ?? null,
-    delivery_radius_km: deliveryZone?.radiusKm ?? null,
+    // Per-scope zones (STANDARD vs FROZEN radius/cost) for storefronts that
+    // show different coverage per product type; delivery_cost/radius_km below
+    // stay for older callers that only know about one flat zone.
+    delivery_zones: deliveryZones,
+    ...flattenDeliveryZone(deliveryZones),
     payment_alias: paymentConfig?.paymentAlias ?? null,
     payment_titular: paymentConfig?.paymentTitular ?? null,
     payment_cvu: paymentConfig?.paymentCvu ?? null,

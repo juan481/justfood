@@ -18,6 +18,7 @@
     "generate:api-key": "tsx scripts/generate-api-key.ts",
     "onboard:tenant": "tsx scripts/onboard-tenant.ts",
     "set:payment-config": "tsx scripts/set-payment-config.ts",
+    "set:delivery-zones": "tsx scripts/set-delivery-zones.ts",
     "seed:demo": "tsx scripts/seed-demo-data.ts"
   },
   "dependencies": {

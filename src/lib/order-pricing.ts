@@ -47,6 +47,11 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
 
   const pricedItems: PricedItem[] = [];
   let subtotal = 0;
+  // Drives which DeliveryZone scope(s) apply to this order (STANDARD vs
+  // FROZEN radios/costs — see resolveDeliveryFee in create-order.ts). A
+  // half-and-half pizza is never frozen, so only the main product counts.
+  let hasStandardItem = false;
+  let hasFrozenItem = false;
 
   for (const item of items) {
     if (typeof item.productId !== 'string' || !item.productId) {
@@ -86,7 +91,9 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
       notes: item.notes ?? null,
     });
     subtotal += unitPrice * quantity;
+    if (product.isFrozen) hasFrozenItem = true;
+    else hasStandardItem = true;
   }
 
-  return { items: pricedItems, subtotal };
+  return { items: pricedItems, subtotal, hasStandardItem, hasFrozenItem };
 }

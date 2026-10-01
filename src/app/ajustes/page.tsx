@@ -34,6 +34,8 @@ export default function AjustesPage() {
 
   const [cost, setCost] = useState('0');
   const [radiusKm, setRadiusKm] = useState('');
+  const [frozenCost, setFrozenCost] = useState('0');
+  const [frozenRadiusKm, setFrozenRadiusKm] = useState('');
   const [paymentAlias, setPaymentAlias] = useState('');
   const [paymentTitular, setPaymentTitular] = useState('');
   const [paymentCvu, setPaymentCvu] = useState('');
@@ -62,8 +64,10 @@ export default function AjustesPage() {
       fetch('/api/v1/admin/business-info').then((r) => r.json()),
     ]).then(([dz, pc, pos, bi]) => {
       if (dz.ok) {
-        setCost(String(dz.cost));
-        setRadiusKm(dz.radiusKm != null ? String(dz.radiusKm) : '');
+        setCost(dz.zones.STANDARD ? String(dz.zones.STANDARD.cost) : '0');
+        setRadiusKm(dz.zones.STANDARD?.radiusKm != null ? String(dz.zones.STANDARD.radiusKm) : '');
+        setFrozenCost(dz.zones.FROZEN ? String(dz.zones.FROZEN.cost) : '0');
+        setFrozenRadiusKm(dz.zones.FROZEN?.radiusKm != null ? String(dz.zones.FROZEN.radiusKm) : '');
       }
       if (pc.ok) {
         setPaymentAlias(pc.paymentAlias);
@@ -91,7 +95,12 @@ export default function AjustesPage() {
       fetch('/api/v1/admin/delivery-zone', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cost: Number(cost) || 0, radiusKm: radiusKm ? Number(radiusKm) : null }),
+        body: JSON.stringify({
+          zones: {
+            STANDARD: { cost: Number(cost) || 0, radiusKm: radiusKm ? Number(radiusKm) : null },
+            FROZEN: { cost: Number(frozenCost) || 0, radiusKm: frozenRadiusKm ? Number(frozenRadiusKm) : null },
+          },
+        }),
       }),
       fetch('/api/v1/admin/payment-config', {
         method: 'PUT',
@@ -285,20 +294,42 @@ export default function AjustesPage() {
                 <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-semibold">Delivery & Checkout</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <label className="text-xs text-slate-500 space-y-1">
-                  <span className="font-semibold text-slate-600">Costo Fijo de Envío ($ ARS)</span>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
-                    <input className="w-full pl-6 pr-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={cost} onChange={(e) => setCost(e.target.value.replace(/\D/g, ''))} />
-                  </div>
-                  <p className="text-[10px] text-slate-400">Se suma al seleccionar Delivery</p>
-                </label>
-                <label className="text-xs text-slate-500 space-y-1">
-                  <span className="font-semibold text-slate-600">Radio Máximo (Kilómetros)</span>
-                  <input className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={radiusKm} onChange={(e) => setRadiusKm(e.target.value)} placeholder="3" />
-                  <p className="text-[10px] text-slate-400">{address ? `Desde: ${address}` : 'Cargá la dirección del local arriba para medir el radio desde ahí'}</p>
-                </label>
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-slate-600">Estándar (pizzas, bebidas y el resto de la carta)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="text-xs text-slate-500 space-y-1">
+                    <span className="font-semibold text-slate-600">Costo Fijo de Envío ($ ARS)</span>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                      <input className="w-full pl-6 pr-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={cost} onChange={(e) => setCost(e.target.value.replace(/\D/g, ''))} />
+                    </div>
+                    <p className="text-[10px] text-slate-400">Se suma al seleccionar Delivery</p>
+                  </label>
+                  <label className="text-xs text-slate-500 space-y-1">
+                    <span className="font-semibold text-slate-600">Radio Máximo (Kilómetros)</span>
+                    <input className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={radiusKm} onChange={(e) => setRadiusKm(e.target.value)} placeholder="2" />
+                    <p className="text-[10px] text-slate-400">{address ? `Desde: ${address}` : 'Cargá la dirección del local arriba para medir el radio desde ahí'}</p>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-1 pt-2 border-t border-slate-100">
+                <p className="text-xs font-semibold text-slate-600 pt-2">Congelados</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="text-xs text-slate-500 space-y-1">
+                    <span className="font-semibold text-slate-600">Costo Fijo de Envío ($ ARS)</span>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                      <input className="w-full pl-6 pr-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={frozenCost} onChange={(e) => setFrozenCost(e.target.value.replace(/\D/g, ''))} />
+                    </div>
+                    <p className="text-[10px] text-slate-400">Se suma al seleccionar Delivery</p>
+                  </label>
+                  <label className="text-xs text-slate-500 space-y-1">
+                    <span className="font-semibold text-slate-600">Radio Máximo (Kilómetros)</span>
+                    <input className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm font-mono" value={frozenRadiusKm} onChange={(e) => setFrozenRadiusKm(e.target.value)} placeholder="20" />
+                    <p className="text-[10px] text-slate-400">Si el carrito mezcla estándar + congelados, manda el radio estándar (más chico)</p>
+                  </label>
+                </div>
               </div>
 
               <div className="space-y-1">

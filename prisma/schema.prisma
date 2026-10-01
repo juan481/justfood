@@ -411,22 +411,33 @@ model POSIntegrationConfig {
   @@map("pos_integration_configs")
 }
 
+// STANDARD = catálogo general (pizzas, bebidas, etc.); FROZEN = productos
+// con `Product.isFrozen`; ALL = una sola zona cubre todo el tenant (default
+// histórico, sigue sirviendo a cualquier tenant que no separe congelados).
+enum DeliveryZoneScope {
+  ALL
+  STANDARD
+  FROZEN
+}
+
 model DeliveryZone {
-  id           String  @id @default(cuid())
+  id           String            @id @default(cuid())
   tenantId     String
   branchId     String
   name         String
   // "radius" para el modelo plano actual de PizzaZeka; "polygon" queda
   // listo para cuando un tenant lo necesite (plan sección 7) sin rediseño.
-  type         String  @default("radius")
+  type         String            @default("radius")
+  scope        DeliveryZoneScope @default(ALL)
   radiusKm     Float?
   cost         Int
   minOrderCost Int?
-  isActive     Boolean @default(true)
+  isActive     Boolean           @default(true)
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   branch Branch @relation(fields: [branchId], references: [id])
 
+  @@unique([tenantId, scope])
   @@index([tenantId])
   @@map("delivery_zones")
 }
