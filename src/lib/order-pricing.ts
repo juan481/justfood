@@ -8,6 +8,10 @@ import { prisma } from '@/lib/prisma';
 
 export interface CartItemInput {
   productId: string;
+  // A half-and-half pizza is priced as the more expensive half. The second
+  // product is still validated against the same tenant catalog; its price
+  // never comes from the browser.
+  halfProductId?: string;
   quantity: number;
   notes?: string;
 }
@@ -35,7 +39,7 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
     throw new OrderPricingError('El carrito está vacío.', 'EMPTY_CART');
   }
 
-  const productIds = items.map((i) => i.productId);
+  const productIds = items.flatMap((i) => [i.productId, ...(i.halfProductId ? [i.halfProductId] : [])]);
   const products = await prisma.product.findMany({
     where: { tenantId, id: { in: productIds } },
   });
@@ -55,6 +59,14 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
     if (!product.isActive) {
       throw new OrderPricingError(`"${product.name}" ya no está disponible.`, 'PRODUCT_UNAVAILABLE', item.productId);
     }
+
+    const halfProduct = item.halfProductId ? productById.get(item.halfProductId) : null;
+    if (item.halfProductId && !halfProduct) {
+      throw new OrderPricingError('La segunda mitad no existe.', 'PRODUCT_NOT_FOUND', item.halfProductId);
+    }
+    if (halfProduct && !halfProduct.isActive) {
+      throw new OrderPricingError(`"${halfProduct.name}" ya no está disponible.`, 'PRODUCT_UNAVAILABLE', item.halfProductId);
+    }
     // This endpoint is public: TypeScript types do not validate hostile JSON.
     // Bound quantities to a realistic order size so Infinity/NaN or an abusive
     // payload cannot turn into a database error or an accidental huge order.
@@ -62,14 +74,18 @@ export async function priceCart(tenantId: string, items: CartItemInput[]) {
     if (!Number.isSafeInteger(quantity) || quantity < 1 || quantity > 100) {
       throw new OrderPricingError('Cantidad inválida (debe ser un entero entre 1 y 100).', 'INVALID_QUANTITY', item.productId);
     }
+    const unitPrice = halfProduct ? Math.max(product.price, halfProduct.price) : product.price;
+    const productName = halfProduct
+      ? `Media y media: ½ ${product.name} + ½ ${halfProduct.name}`
+      : product.name;
     pricedItems.push({
       productId: product.id,
-      productNameSnapshot: product.name,
-      unitPriceSnapshot: product.price,
+      productNameSnapshot: productName,
+      unitPriceSnapshot: unitPrice,
       quantity,
       notes: item.notes ?? null,
     });
-    subtotal += product.price * quantity;
+    subtotal += unitPrice * quantity;
   }
 
   return { items: pricedItems, subtotal };
