@@ -30,6 +30,9 @@ enum UserRole {
   COCINA
   CADETE
   MOSTRADOR
+  // Fase 2 (Salón) — pantalla de Barra, ve solo los ítems de bebidas/tragos
+  // de los pedidos de mesa, nunca comida ni precios/caja.
+  BARRA
 }
 
 model Tenant {
@@ -59,6 +62,8 @@ model Tenant {
   products             Product[]
   orders               Order[]
   tables               TableInventory[]
+  // Mesas en vivo de Fase 2 (Salón) — ver comentario en el modelo Table.
+  liveTables           Table[]
   reservations         Reservation[]
   leads                Lead[]
   pageViews            PageView[]
@@ -87,6 +92,7 @@ model Branch {
   users         User[]
   orders        Order[]
   tables        TableInventory[]
+  liveTables    Table[]
   reservations  Reservation[]
   deliveryZones DeliveryZone[]
   couriers      Courier[]
@@ -149,6 +155,12 @@ model Category {
   tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   products Product[]
 
+  // A qué estación de preparación van los productos de esta categoría por
+  // default (Fase 2 Salón) — un producto puede pisarlo con
+  // Product.prepAreaOverride. Mismo criterio que isFrozen en Product: un
+  // flag simple, no un sistema de tags.
+  prepArea PrepArea @default(COCINA)
+
   @@index([tenantId])
   @@map("categories")
 }
@@ -167,6 +179,9 @@ model Product {
   // (products.is_frozen) rather than generalized into a tags system —
   // nothing in Fase 1 needs more than this yet.
   isFrozen        Boolean  @default(false)
+  // null = hereda la estación de su categoría (Category.prepArea). Mismo
+  // precedente que isFrozen: un flag, no un sistema de tags.
+  prepAreaOverride PrepArea?
   sortOrder       Int      @default(0)
   imageUrl        String?
   // Original SQLite row id, kept for ETL traceability (plan section 7).
@@ -188,6 +203,28 @@ enum OrderChannel {
   WEB
   MOSTRADOR
   WHATSAPP
+  // Fase 2 — pedido de salón, vinculado a una Table en vivo.
+  DINE_IN
+}
+
+// Estación de preparación física (Fase 2 Salón) — a dónde se imprime/rutea
+// cada ítem del pedido: cocina, barra, o directo de la heladera (sin ticket).
+enum PrepArea {
+  COCINA
+  BARRA
+  SIN_IMPRESION
+}
+
+// Estado en vivo de una mesa física (Fase 2 Salón). Verde/Rojo/Azul en la
+// grilla — ver Table más abajo.
+enum TableStatus {
+  LIBRE
+  OCUPADA
+  // Pre-cuenta impresa (reversible, ver reopenTable) o pedido de mesa
+  // cerrado con Mercado Pago/Transferencia esperando que un operador
+  // apruebe el comprobante en /pagos — la mesa se queda acá hasta esa
+  // aprobación, no se libera antes.
+  ESPERANDO_PAGO
 }
 
 enum OrderStatus {
@@ -246,9 +283,24 @@ model Order {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
+  // Fase 2 (Salón) — solo tiene sentido con channel=DINE_IN. tableId es el
+  // vínculo histórico permanente (muchos pedidos → una mesa en el tiempo);
+  // Table.currentOrderId es el puntero efímero de "está ocupada ahora",
+  // separado para poder limpiarlo al cerrar sin romper el historial.
+  tableId      String?
+  guestCount   Int?
+  waiterUserId String?
+  // Copia denormalizada, mismo criterio que courierName — se sigue
+  // mostrando en la comanda/drawer aunque el User se borre después.
+  waiterName   String?
+
   tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   branch  Branch   @relation(fields: [branchId], references: [id])
   courier Courier? @relation(fields: [courierId], references: [id])
+  table   Table?   @relation("TableHistory", fields: [tableId], references: [id])
+  // Relación inversa requerida por Table.currentOrderId — no se usa desde
+  // el código de la app, solo existe para que Prisma arme la FK.
+  tableAsCurrent Table? @relation("TableCurrentOrder")
 
   items           OrderItem[]
   statusEvents    OrderStatusEvent[]
@@ -259,22 +311,33 @@ model Order {
   @@index([tenantId, status])
   @@index([tenantId, channel])
   @@index([courierId])
+  @@index([tableId])
   @@map("orders")
 }
 
 model OrderItem {
-  id                  String  @id @default(cuid())
+  id                  String   @id @default(cuid())
   orderId             String
   productId           String?
   productNameSnapshot String
   unitPriceSnapshot   Int
-  quantity            Int     @default(1)
+  quantity            Int      @default(1)
   notes               String?
+  createdAt           DateTime @default(now())
+  // Estación de preparación al momento de crear el ítem (Fase 2 Salón) —
+  // igual criterio que productNameSnapshot/unitPriceSnapshot: una comanda
+  // ya impresa nunca cambia de estación porque alguien editó la categoría
+  // después. null para todo lo creado antes de esta fase.
+  prepAreaSnapshot    PrepArea?
+  // null = todavía pendiente en su estación; se completa cuando Cocina o
+  // Barra lo marca listo.
+  preparedAt          DateTime?
 
   order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id])
 
   @@index([orderId])
+  @@index([prepAreaSnapshot, preparedAt])
   @@map("order_items")
 }
 
@@ -290,6 +353,35 @@ model OrderStatusEvent {
 
   @@index([orderId])
   @@map("order_status_events")
+}
+
+// Fase 2 (Salón) — mesa física real, con estado en vivo. Distinto de
+// TableInventory (abajo), que es solo un contador de "cuántas mesas de
+// cada capacidad hay" para el módulo de reservas — no tiene identidad
+// propia ni estado. Este modelo sí: Mesa 1, Mesa 2... Mesa 24, cada una
+// con su color (TableStatus) y el pedido que tiene adentro ahora mismo.
+model Table {
+  id             String      @id @default(cuid())
+  tenantId       String
+  branchId       String
+  number         Int
+  capacity       Int         @default(4)
+  status         TableStatus @default(LIBRE)
+  // Puntero efímero al pedido en curso — null cuando la mesa está libre.
+  // El historial completo de pedidos de esta mesa vive en
+  // Order.tableId/orderHistory, que no se limpia nunca.
+  currentOrderId String?     @unique
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  tenant       Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branch       Branch  @relation(fields: [branchId], references: [id])
+  currentOrder Order?  @relation("TableCurrentOrder", fields: [currentOrderId], references: [id])
+  orderHistory Order[] @relation("TableHistory")
+
+  @@unique([tenantId, branchId, number])
+  @@index([tenantId])
+  @@map("tables")
 }
 
 model TableInventory {
