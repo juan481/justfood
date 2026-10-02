@@ -12,6 +12,11 @@ export interface TableWithOrder {
   currentOrder: Order | null;
 }
 
+interface Staff {
+  id: string;
+  username: string;
+}
+
 function minutesSince(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
 }
@@ -25,12 +30,23 @@ interface TableDrawerProps {
   onChanged: () => void;
 }
 
+// Panel lateral único para CUALQUIER clic en una mesa — libre, ocupada o en
+// pre-cuenta. Antes, una mesa libre abría un modal centrado (distinto al
+// panel lateral de una mesa ocupada); UX pidió que sea siempre el mismo
+// lugar/animación, nada de pop-up.
 export function TableDrawer({ tableId, freeTables, onClose, onAddItems, onCloseTable, onChanged }: TableDrawerProps) {
   const [table, setTable] = useState<TableWithOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMovePicker, setShowMovePicker] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Formulario de apertura (solo se usa si la mesa está LIBRE).
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [guestCount, setGuestCount] = useState('');
+  const [waiterUserId, setWaiterUserId] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [openNotes, setOpenNotes] = useState('');
 
   function load() {
     setLoading(true);
@@ -44,8 +60,37 @@ export function TableDrawer({ tableId, freeTables, onClose, onAddItems, onCloseT
 
   useEffect(() => {
     load();
+    fetch('/api/v1/admin/staff')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok) setStaff(d.staff);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableId]);
+
+  async function openTable() {
+    const guests = parseInt(guestCount, 10);
+    if (!Number.isSafeInteger(guests) || guests < 1) {
+      setError('Ingresá la cantidad de comensales.');
+      return;
+    }
+    if (!waiterUserId) {
+      setError('Elegí quién atiende la mesa.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    const res = await fetch(`/api/v1/admin/salon/tables/${tableId}/open`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guestCount: guests, waiterUserId, customerName: customerName || undefined, notes: openNotes || undefined }),
+    });
+    const data = await res.json();
+    setBusy(false);
+    if (!data.ok) return setError(data.error);
+    load();
+    onChanged();
+  }
 
   async function preBill() {
     setBusy(true);
@@ -98,6 +143,79 @@ export function TableDrawer({ tableId, freeTables, onClose, onAddItems, onCloseT
     );
   }
 
+  if (table.status === 'LIBRE') {
+    return (
+      <div className="fixed inset-0 z-50 flex justify-end">
+        <div className="absolute inset-0 bg-command-950/60 backdrop-blur-sm animate-in fade-in" onClick={onClose} />
+        <div className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
+          <div className="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white p-5 flex items-center justify-between shrink-0">
+            <span className="font-bold text-lg">Abrir Mesa {table.number}</span>
+            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
+              <span className="material-symbols-rounded">close</span>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-5 space-y-3">
+            <label className="block space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Comensales</span>
+              <input
+                autoFocus
+                type="number"
+                min={1}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-command-800"
+                value={guestCount}
+                onChange={(e) => setGuestCount(e.target.value.replace(/\D/g, ''))}
+                placeholder="Ej: 4"
+                onKeyDown={(e) => e.key === 'Enter' && openTable()}
+              />
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Mozo</span>
+              <select
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-command-800"
+                value={waiterUserId}
+                onChange={(e) => setWaiterUserId(e.target.value)}
+              >
+                <option value="">Elegir...</option>
+                {staff.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.username}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Cliente (opcional)</span>
+              <input
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-command-800"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Notas (opcional)</span>
+              <input
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-command-800"
+                value={openNotes}
+                onChange={(e) => setOpenNotes(e.target.value)}
+                placeholder="Ej: juntan dos mesas"
+              />
+            </label>
+            {error && <p className="text-xs text-red-600">{error}</p>}
+          </div>
+          <div className="p-5 border-t border-slate-200 shrink-0">
+            <button
+              onClick={openTable}
+              disabled={busy}
+              className="w-full py-3 rounded-xl bg-command-800 hover:bg-command-900 text-white font-bold text-sm uppercase tracking-wide transition-all disabled:opacity-50"
+            >
+              {busy ? 'Abriendo...' : 'Abrir mesa'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const order = table.currentOrder;
   const elapsedMin = order ? minutesSince(order.createdAt) : 0;
   const isLockedPendingPayment = table.status === 'ESPERANDO_PAGO' && order?.status === 'EN_ESPERA_PAGO';
@@ -106,7 +224,7 @@ export function TableDrawer({ tableId, freeTables, onClose, onAddItems, onCloseT
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-command-950/60 backdrop-blur-sm animate-in fade-in" onClick={onClose} />
-      <div className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      <div className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
         <div className="bg-gradient-to-r from-command-950 via-command-900 to-command-800 text-white p-5 space-y-1 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 flex-wrap">
